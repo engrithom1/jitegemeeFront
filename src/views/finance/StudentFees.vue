@@ -44,7 +44,7 @@
                     aria-describedby="emailHelp"
                   />
                 </div>
-                <div class="form-group">
+                <!--div class="form-group">
                   <label for="famount">Payment Duration*</label>
                   <select
                     v-model="this.form.duration"
@@ -68,7 +68,7 @@
                     placeholder="230000"
                     aria-describedby="emailHelp"
                   />
-                </div>
+                </div-->
                 <button class="btn btn-success">Submit</button>
               </form>
             </div>
@@ -91,8 +91,8 @@
                         <thead>
                           <th><b>Fee Name</b></th>
                           <th><b>Amount</b></th>
-                          <th><b>Min Amount</b></th>
-                          <th><b>Duration</b></th>
+                          <!--th><b>Min Amount</b></th>
+                          <th><b>Duration</b></th-->
                           <th style="width:100px"><b>Action</b></th>
                         </thead>
                         <tbody>
@@ -103,12 +103,12 @@
                             <td class="">
                               {{ fee.amount }}
                             </td>
-                            <td class="">
+                            <!--td class="">
                               {{ fee.min_amount }}
                             </td>
                             <td class="">
                               {{ fee.duration }}
-                            </td>
+                            </td-->
                             <td class="view-message" >
                               <button
                                 @click="
@@ -191,7 +191,7 @@
                 aria-describedby="emailHelp"
               />
             </div>
-            <div class="form-group">
+            <!--div class="form-group">
               <label for="famount">Payment Duration*</label>
               <select
                 v-model="this.edit_duration"
@@ -204,8 +204,8 @@
               <option class="text-capitalize" value="3">3</option>
               <option class="text-capitalize" value="4">4</option>
               </select>
-            </div>
-            <div>
+            </div-->
+            <!--div>
               <div v-show="min_amount_edit_bool" class="form-group">
               <label for="famount">Minimum Amount*</label>
               <input
@@ -217,7 +217,7 @@
                 aria-describedby="emailHelp"
               />
               </div>
-            </div>
+            </div-->
             
             <!-- Modal footer -->
             <div class="modal-footer">

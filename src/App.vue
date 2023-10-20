@@ -1,5 +1,5 @@
 <template>
-  <div v-show="loged" class="full_container">
+  <div  v-if="loged" class="full_container">
     <div class="inner_container">
       <!-- Sidebar  -->
       <nav id="sidebar">
@@ -18,14 +18,14 @@
             <div class="icon_setting"></div>
             <div class="user_profle_side">
               <div class="user_img">
-                <img
+                <img  v-if="loged"
                   class="img-responsive"
                   :src="'/assets/images/logo/'+this.user.photo"
                   alt="#"
                 />
               </div>
               <div class="user_info">
-                <h6>{{ this.user.username.substring(0,11)+".." }}</h6>
+                <h6  v-if="loged">{{ this.user.username.substring(0,11)+".." }}</h6>
                 <p><span class="online_animation"></span> Online</p>
               </div>
             </div>
@@ -242,7 +242,7 @@
     </div>
   </div>
 
-  <div v-show="!loged">
+  <div  v-if="!loged">
     <Login />
   </div>
 </template>
@@ -263,7 +263,7 @@ export default {
   },
   data() {
     return {
-      loged: "",
+      loged: false,
       user: {},
     };
   },
