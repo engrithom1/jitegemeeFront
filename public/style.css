@@ -556,8 +556,8 @@ a:focus {
 
 .heading1 h2 {
     line-height: normal;
-    font-size: 21px;
-    font-weight: 400;
+    font-size: 18px;
+    font-weight: 500;
     margin: 0;
     padding-left: 0;
     color: #15283c;
@@ -2702,7 +2702,7 @@ ul.labels-info li a i {
     text-transform: none;
     letter-spacing: 0;
     color: #15283c;
-    font-size: 21px;
+    font-size: 17px;
 }
 
 .inbox-head .sr-input {

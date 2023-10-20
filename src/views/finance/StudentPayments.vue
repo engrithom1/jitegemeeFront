@@ -9,7 +9,7 @@
         </div>
       </div>
       <!--contents heaa-->
-      <div v-show="!find_student" class="row column4 graph">
+      <div v-if="!find_student" class="row column4 graph">
         <div class="col-sm-6">
           <div class="white_shd full margin_bottom_30">
             <div class="full graph_head">
@@ -52,9 +52,9 @@
              
 
       <!--add payments-->
-      <div v-show="find_student" class="row column4 graph">
+      <div v-if="find_student" class="row column4 graph">
         <div class="col-sm-6">
-          <div class="white_shd full margin_bottom_30">
+          <div v-if="prepare_payment" class="white_shd full margin_bottom_30">
             <div class="full graph_head">
               <div class="d-flex justify-content-between">
                 <div class="heading1 margin_0"><h2>Prepare for Payments</h2></div>
@@ -63,7 +63,7 @@
             </div>
             <div class="full progress_bar_inner">
               <div class="row">
-                <div class="col-12 p-3">
+                <div class="col-12">
                   <form @submit.prevent="checkRequiredFees" class="p-3">
                           <div class="form-group">
                             <label for="pgender">Accademic Year*</label>
@@ -131,7 +131,7 @@
               </div>
             </div>
           </div>
-          <div class="white_shd full margin_bottom_30">
+          <div v-if="!prepare_payment" class="white_shd full margin_bottom_30">
             <div class="full graph_head">
               <div class="d-flex justify-content-between">
                 <div class="heading1 margin_0"><h2>Add Payments</h2></div>
@@ -141,128 +141,138 @@
             <div class="full progress_bar_inner">
               <div class="row">
                 <div class="col-12">
+                  <div class="pt-3 pr-3 pl-3 d-flex justify-content-between">
+                    <h5 class="text-camelcase">Balance</h5>
+                    <h5 class="text-camelcase">TZS: {{ student_balance.amount }}</h5>
+                  </div>
                   <div class="p-3">
-                    <div class="form-group">
-                      <label>Total Paid (Tsh)</label>
-                      <input
-                        class="form-control"
-                        type="number"
-                        v-model="total_paid"
-                        name="total_paid"
-                        id=""
-                      />
-                    </div>
-                    <div class="form-group">
-                      <label>Balance (Tsh)</label>
-                      <input
-                        class="form-control"
-                        type="number"
-                        v-model="balance"
-                        name="balance"
-                        disabled
-                        id=""
-                      />
-                    </div>
+                    
+                  <form @submit.prevent="addPayment">
                     <div class="row">
-                      <div class="col-sm-6">
+                      <div class="col-sm-12">
                         <div class="form-group">
-                          <label>Fee Type</label>
+                          <label  for="pfeez">Choose Fee Type</label>
                           <select
-                            name="fee"
-                            v-model="fee"
+                            v-on:change="setPayAmount()"
+                            v-model=" pay_selected_fee"
                             class="form-control"
                             @change="this.feeSelect"
-                            id="pgender"
+                            id="pfeez"
+                            required
                           >
-                            <option value="0">Select Fee</option>
-                            <option
-                              v-bind:value="
-                                JSON.stringify({
-                                  label: 'Tuition Fee',
-                                  amount: 200000,
-                                })
-                              "
-                            >
-                              Tuition Fee
-                            </option>
-                            <option
-                              v-bind:value="
-                                JSON.stringify({
-                                  label: 'Food',
-                                  amount: 120000,
-                                })
-                              "
-                            >
-                              Food
-                            </option>
-                            <option
-                              v-bind:value="
-                                JSON.stringify({
-                                  label: 'Liblaly',
-                                  amount: 30000,
-                                })
-                              "
-                            >
-                              Libraly fee
-                            </option>
-                            <option
-                              v-bind:value="
-                                JSON.stringify({
-                                  label: 'Registration Fee',
-                                  amount: 10000,
-                                })
-                              "
-                            >
-                              Registration fee
-                            </option>
+                            <option  v-for="feepay in feepays" :key="feepay.id" :value="feepay">{{ feepay.fee }}</option>
+                            
                           </select>
-                        </div>
-                        <div class="form-group">
-                          <label>Valid From</label>
-                          <input
-                            class="form-control"
-                            type="date"
-                            name="valid_to"
-                            id=""
-                          />
                         </div>
                       </div>
                       <div class="col-sm-6">
                         <div class="form-group">
-                          <label>Amount (Tsh)</label>
+                          <label for="pay_amount">Amount (Tsh)</label>
                           <input
                             class="form-control"
                             type="number"
-                            v-model="fee_amount"
+                            v-model="pay_amount"
                             name="fee_amount"
-                            id=""
+                            id="pay_amount"
+                            required
                           />
                         </div>
+                        
+                      </div>
+                      <div class="col-sm-6">
                         <div class="form-group">
-                          <label>To</label>
+                          <label for="date_to">Valid To</label> 
                           <input
                             class="form-control"
                             type="date"
                             name="valid_to"
-                            id=""
+                            id="date_to"
+                            v-model="pay_valid_to"
+                            required
                           />
                         </div>
                       </div>
                     </div>
 
-                    <div class="form-group">
-                      <label>New Balance (Tsh {{ this.newBalance }})</label>
-                      <input
-                        class="form-control"
-                        type="number"
-                        v-model="n_balance"
-                        disabled
-                        id=""
-                      />
-                    </div>
-                    <button @click="this.onPayment" class="btn btn-success">
+                    <button type="submit" class="btn btn-success">
                       Add Payments
                     </button>
+                  </form>
+                  <hr/>
+                 </div> 
+                  <h5 class="text-center">Fees and Contribution Required to be Paid</h5>
+                  <!--table ya to pay feees-->
+                  <div class="">
+                    <div class="inbox-body">
+                    <div class="mail-option">
+                      <table class="table table-inbox table-hover">
+                        <thead>
+                          <th><b>Fee Name</b></th>
+                          <th><b>Amount</b></th>
+                          <th><b>Paid</b></th>
+                        
+                          <th style="width:20px"><b></b></th>
+                        </thead>
+                        <tbody>
+                          <tr v-for="feepay in feepays" :key="fee.id" class="">
+                            <td class="">
+                              {{ feepay.fee }}
+                            </td>
+                            <td class="">
+                              {{ feepay.amount }}
+                            </td>
+                            <td class="">
+                              {{ feepay.paid_amount }}
+                            </td>
+                            <td class="view-message" >
+                              <div>
+                                <i v-if="feepay.status == 0" class="fa fa-exclamation-triangle text-danger"></i>
+                                <i v-else class="fa fa-check text-success"></i>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                       
+                      </table>
+                     
+                    </div>
+                    
+                  </div>
+                
+                  </div>
+                  
+                  <h5 class="text-center">Add other Required Fees to be Paid</h5>
+                  <!--table ya to add feees-->
+                  <div class="">
+                    <div class="inbox-body">
+                    <div class="mail-option">
+                      <table class="table table-inbox table-hover">
+                        <thead>
+                          <th><b>Fee Name</b></th>
+                          <th><b>Amount</b></th>
+                    
+                        
+                          <th style="width:50px"><b></b></th>
+                        </thead>
+                        <tbody>
+                          <tr v-for="feepay in o_fees" :key="feepay.id" class="">
+                            <td class="">
+                              {{ feepay.fee }}
+                            </td>
+                            <td class="">
+                              {{ feepay.amount }}
+                            </td>
+                           
+                            <td class="view-message" >
+                              <div>
+                                <button @click="addFeeToStudent(feepay.id, feepay.amount)" class="btn btn-success"><i class="fa fa-plus"></i>Add Fee</button>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                   </div>
                 </div>
               </div>
@@ -270,6 +280,49 @@
           </div>
         </div>
         <div class="col-sm-6">
+          <!--deposit slip-->
+          <div v-if="!prepare_payment" class="white_shd full margin_bottom_30">
+            <div class="full graph_head">
+              <div class="d-flex justify-content-between">
+                <div class="heading1 margin_0"><h2>Deposit Slip</h2></div>
+              </div>
+            </div>
+            <div class="full progress_bar_inner">
+              <form @submit.prevent="updateClass" class="p-3">
+            <p v-for="error in edit_errors" :key="error" class="text-danger">
+              {{ error[0] }}
+            </p>
+            <div class="form-group">
+              <label for="damount">Amount*</label>
+              <input
+                type="text"
+                id="damount"
+                min="1000"
+                class="form-control"
+                v-model="this.deposit_amount"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="dnumber">Transaction No*</label>
+              <input
+                type="text"
+                id="dnumber"
+                class="form-control"
+                v-model="this.deposit_number"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="ddescription">Description*</label>
+              <textarea required class="form-control" v-model="this.deposit_description" id="ddescription" rows="3">
+              </textarea>
+            </div>
+              <button type="submit" class="btn btn-success">Add Slip</button>
+          </form>
+            </div>
+          </div>    
+          <!--student details-->
           <div class="white_shd full margin_bottom_30">
             <div class="full graph_head">
               <div class="d-flex justify-content-between">
@@ -303,59 +356,6 @@
         </div>
       </div>
       <!--contents heaa-->
-      <div v-if="payments.length > 0" class="row column4 graph">
-        <div class="col-12">
-          <div class="white_shd full margin_bottom_30">
-            <div class="full progress_bar_inner">
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="inbox-body">
-                    <div class="mail-option">
-                      <div class="btn-group hidden-phone">
-                        <button
-                          @click="this.completePayments"
-                          class="btn btn-info"
-                        >
-                          Complete Payments
-                        </button>
-                      </div>
-
-                      <table class="table table-inbox table-hover">
-                        <thead>
-                          <th><b>Fee Name</b></th>
-                          <th><b>Amount</b></th>
-                          <th><b>Valid From</b></th>
-                          <th><b>Valid To</b></th>
-                          <th><b>Action</b></th>
-                        </thead>
-                        <tbody>
-                          <tr
-                            v-for="payment in payments"
-                            :key="payment.amount"
-                            class=""
-                          >
-                            <td class="view-message">{{ payment.name }}</td>
-                            <td class="view-message">{{ payment.amount }}</td>
-                            <td class="view-message">23-3489</td>
-                            <td class="view-message inbox-small-cells">
-                              Sambokile kandenga kindeki
-                            </td>
-                            <td class="view-message">
-                              <button class="btn btn-danger mr-1">
-                                <i class="fa fa-trash"></i>
-                              </button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
     <!-- footer -->
     <div class="container-fluid">
@@ -372,8 +372,10 @@ import axios from "axios";
 export default {
   data() {
     return {
-      ////futa chini
+      
       find_student: false,
+      prepare_payment: true,
+      ////futa chini
       balance: 12000,
       total_paid: 0,
       n_balance: "",
@@ -397,7 +399,18 @@ export default {
       level_id:"",
       search_index_no:"",
       index_no_erro:"",
-      admission_id:""
+      admission_id:"",
+      feepays:[],
+      o_fees:[],
+      student_balance:{'amount':0},
+      ////deposite slip
+      deposit_amount:"",
+      deposit_description:"",
+      deposit_number:"",
+      ///////add payment
+      pay_selected_fee:{},
+      pay_amount:"",
+      pay_valid_to:""
     };
   },
   methods: {
@@ -466,36 +479,51 @@ export default {
 
         axios.post(this.$store.state.api_url + "/check_required_fees",{student_id,class_id,year,fees,level_id,user_id,role_id,admission_id}).then((response) => {
         console.log(response.data);
+        if (response.data.success) {
+            this.feepays = response.data.feepay;
+            this.o_fees = response.data.o_fees;
+            this.student_balance = response.data.student_balance;
+            this.prepare_payment = false;
+        } else {
+            alert(response.data.message);
+        }
 
-        //this.students = response.data.students;
-        //this.subjects = response.data.subjects;
-        //this.hosted = response.data.hosted;
-
-        //this.find_clas = !this.find_clas
+        }).catch((errors) => {
+          console.log(errors);
+          alert("Something goes wrong try again");
         });
 
     },
-    ///zakufuta izoooooooooo
-    completePayments() {
-      alert("Payments Completed Successfull !");
-      this.find_student = !this.find_student;
-      this.payments = [];
+    setPayAmount(){
+      this.pay_amount = this.pay_selected_fee.amount - this.pay_selected_fee.paid_amount
     },
-    onPayment() {
-      this.n_balance = this.total_paid - this.fee_amount;
-      var name = this.name;
-      var amount = this.amount;
-
-      //alert(name+", "+amount)
-
-      this.payments = [...this.payments, { name, amount }];
+    addPayment(){
+      alert('wowowowowowowo')
     },
-    feeSelect() {
-      var selectedFee = JSON.parse(this.fee);
-      //console.log(selectedFee)
-      this.fee_amount = selectedFee.amount;
-      this.name = selectedFee.label;
-      this.amount = selectedFee.amount;
+    addFeeToStudent(fee_id, fee_amount){
+      
+      var class_id = this.selected_class.id;
+        var fees = this.selected_class.fees;
+        var student_id = this.student.id;
+        var user_id = this.user_id;
+        var role_id = this.role_id;
+        var level_id = this.level_id;
+        var admission_id = this.admission_id;
+        var year = this.accademic_year
+
+        axios.post(this.$store.state.api_url + "/check_required_fees",{student_id,class_id,year,fees,level_id,user_id,role_id,admission_id}).then((response) => {
+        console.log(response.data);
+        if (response.data.success) {
+            this.feepays = response.data.feepay;
+            this.o_fees = response.data.o_fees;
+        } else {
+            alert(response.data.message);
+        }
+
+        }).catch((errors) => {
+          console.log(errors);
+          alert("Something goes wrong try again");
+        });
     },
     allLevel() {
       axios.get(this.$store.state.api_url + "/levels").then((response) => {
@@ -525,12 +553,6 @@ export default {
     this.allLevel();
     this.allClaszs();
     this.isAuth();
-  },
-  computed: {
-    newBalance() {
-      this.n_balance = this.balance + this.total_paid;
-      return 0;
-    },
   },
 };
 </script>
