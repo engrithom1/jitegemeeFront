@@ -6,8 +6,6 @@ import router from './router'
 import store from './store/index'
 window.$ = window.jQuery = require('jquery');
 
-
-
 //import Auth from './packages/Auth.js'
 
 /*slint-disable no-new*/
