@@ -47,7 +47,12 @@ export default createStore({
       })
   },
   logOut({state,commit},id){
-    axios
+
+    localStorage.removeItem("user_token")
+    localStorage.removeItem("user")
+    commit('setUser',{})
+    window.location.replace('/');
+    /*axios
   .post(state.api_url+'/logout/',id)
   .then(response => {
 
@@ -60,7 +65,7 @@ export default createStore({
      
   }
   
-   });
+   });*/
 }
   },
   

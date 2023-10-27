@@ -76,8 +76,8 @@
                   </div>
                   </div>
                 </div>
-
-                <button class="btn btn-success">Submit</button>
+               
+                <button :disabled="this.form.role_id != 4" class="btn btn-success">Submit</button>
               </form>
             </div>
           </div>
@@ -122,7 +122,7 @@
                               {{ clasz.subjects.split(",").length }}
                             </td>
                             <td class="view-message">
-                              <button
+                              <button :disabled="this.form.role_id != 4"
                                 @click="
                                   getEdit(
                                     clasz.id,
@@ -138,7 +138,7 @@
                               >
                                 <i class="fa fa-edit"></i>
                               </button>
-                              <button
+                              <button :disabled="this.form.role_id != 4"
                                 class="btn btn-sm btn-danger"
                                 @click="deleteClass(clasz.id, clasz.classname)"
                               >

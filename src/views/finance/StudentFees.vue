@@ -69,7 +69,7 @@
                     aria-describedby="emailHelp"
                   />
                 </div-->
-                <button class="btn btn-success">Submit</button>
+                <button :disabled="this.form.role_id != 4" class="btn btn-success">Submit</button>
               </form>
             </div>
           </div>
@@ -110,7 +110,7 @@
                               {{ fee.duration }}
                             </td-->
                             <td class="view-message" >
-                              <button
+                              <button :disabled="this.form.role_id != 4"
                                 @click="
                                   getEdit(
                                     fee.id,
@@ -126,7 +126,7 @@
                               >
                                 <i class="fa fa-edit"></i>
                               </button>
-                              <button
+                              <button :disabled="this.form.role_id != 4"
                                 class="btn btn-sm btn-danger"
                                 @click="deleteFee(fee.id, fee.fee)"
                               >

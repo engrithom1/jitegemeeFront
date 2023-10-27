@@ -29,7 +29,7 @@
                                       <form @submit.prevent="searchStudentIndex"
                                           class="pull-right position search_inbox">
                                           <div class="input-append">
-                                              <input type="text" minlength="4" maxlength="4"
+                                              <input type="text" minlength="4" maxlength="6"
                                                   v-model="this.search_index_no" class="sr-input"
                                                   placeholder="0001" />
                                               <button class="btn sr-btn" type="submit">
@@ -143,8 +143,13 @@
                                       <div class="col-sm-6">
                                           <div class="form-group">
                                               <label for="date_to">Valid Until</label>
-                                              <input class="form-control" type="date" name="valid_to" id="date_to"
-                                                  v-model="pay_valid_to" required />
+                                              <select class="form-control" id="date_to" v-model="pay_valid_to" required >
+                                                <option disabled value="" selected>Select Date</option>
+                                                <option :value="accademic_year+'0410'">{{ '10/ 04/ '+accademic_year }}</option>
+                                                <option :value="accademic_year+'0610'">{{ '10/ 06/ '+accademic_year }}</option>
+                                                <option :value="accademic_year+'0910'">{{ '10/ 09/ '+accademic_year }}</option>
+                                                <option :value="accademic_year+'1210'">{{ '10/ 12/ '+accademic_year }}</option>
+                                              </select>    
                                           </div>
                                       </div>
                                   </div>
@@ -186,8 +191,9 @@
                                                     <i v-else class="fa fa-check text-success"></i>
                                                   </td>
                                                   <td>
-                                                    <button :disabled="add_remove_fee" @click="removeFeeToStudent(feepay)"
-                                                          class="btn btn-default">Remove</button>
+                                                    <button :disabled="add_remove_fee" @click="removeFeeSelect(feepay)"
+                                                        class="btn btn-default" data-toggle="modal"
+                                                        data-target="#remove-modal">Remove</button>
                                                   </td>
                                               </tr>
                                           </tbody>
@@ -301,6 +307,40 @@
           </div>
           <!--contents heaa-->
       </div>
+        <!-- The Modal -->
+        <div class="modal fade hide" data-backdrop="static" data-keyboard="false" id="remove-modal">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                <h4 class="modal-title">Remove Fee</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    &times;
+                </button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                <form @submit.prevent="removeFeeRequest" class="p-3">
+                    <p v-if="remove_fee">Send the request to remove <b>{{ this.remove_fee.fee }}</b>, with amount of <b>{{ this.remove_fee.amount }}</b> and paid amount is <b>{{ this.remove_fee.paid_amount }}</b></p>
+                    <div class="form-group">
+                        <label for="ddescription">Reason To Remove Fee*</label>
+                        <textarea required class="form-control" v-model="this.remove_reason"
+                            id="ddescription" rows="3">
+                        </textarea>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                    <button :disabled="remove_request_btn" class="btn btn-success">Send Request</button>
+                    <button :disabled="remove_request_btn" type="button" class="btn btn-danger" data-dismiss="modal">
+                        Close
+                    </button>
+                    </div>
+                </form>
+                </div>
+            </div>
+            </div>
+        </div>
+  <!-- end model popup -->
       <!-- footer -->
       <div class="container-fluid">
           <div class="footer">
@@ -309,6 +349,7 @@
       </div>
       <!-- payment table-->
   </div>
+  
 </template>
 
 <script>
@@ -321,6 +362,8 @@ export default {
       add_remove_fee:false,
       add_payment_btn:false,
       deposit_slip_btn:false,
+      remove_request_btn:false,
+      find_btn: false,
       ////above futa
       user_id:"",
       role_id:"",
@@ -345,7 +388,10 @@ export default {
       ///////add payment
       pay_selected_fee:{},
       pay_amount:"",
-      pay_valid_to:""
+      pay_valid_to:"",
+      ////remove fee request
+      remove_fee:{},
+      remove_reason:""
     };
   },
   methods: {
@@ -369,8 +415,9 @@ export default {
       this.index_no_erro = ""
       var index_no = this.search_index_no
 
-      if(index_no > 0 && index_no < 10000){
-        
+      if(index_no > 0 && index_no < 100000){
+        this.find_btn = true
+
         axios.post(this.$store.state.api_url + "/search_student_index_no",{'index_no':index_no}).then((response) => {
         var student = response.data.student;
 
@@ -392,13 +439,16 @@ export default {
 
             this.find_student = !this.find_student;
           }
+          this.find_btn = false
         }else{
           this.index_no_erro = "Not student found, Enter correct index no"
+          this.find_btn = false
         }
         });
       
       }else{
         this.index_no_erro = "Enter correct index no "+this.search_index_no
+        this.find_btn = false
       }
     },
     checkRequiredFees(){
@@ -481,34 +531,34 @@ export default {
       var user_id = this.user_id;
       var role_id = this.role_id;
       ///form inputs
-      var pay_amount = this.pay_amount
+      var pay_amount = parseInt(this.pay_amount)
       var valid_to = this.pay_valid_to
       var year = this.accademic_year
       ///selected fee
       var s_id = this.pay_selected_fee.id
       var f_id = this.pay_selected_fee.f_id
-      var s_amount = this.pay_selected_fee.amount
-      var s_paid_amount = this.pay_selected_fee.paid_amount
+      var s_amount = parseInt(this.pay_selected_fee.amount)
+      var s_paid_amount = parseInt(this.pay_selected_fee.paid_amount)
       ///balnce data
-      var b_amount = this.student_balance.amount
+      var b_amount = parseInt(this.student_balance.amount)
       var b_id = this.student_balance.id
 
       ////date mandingo
-      var yy = valid_to.split('-')[0]
-      var mm = valid_to.split('-')[1]
-      var dd = valid_to.split('-')[2]
-
-      var valid_to = yy+""+mm+""+dd
-
-      if(yy > year){
-          alert("can't pay for the next year")
+      if(s_amount > s_paid_amount + pay_amount && valid_to == year+'1210'){
+        alert('The date should be below 10/ 12/ '+year)
       }else{
+
+        if(s_amount == s_paid_amount + pay_amount && valid_to != year+'1210'){
+            alert('The date should be 10/ 12/ '+year)
+        }else{
+
           if(pay_amount > s_amount - s_paid_amount){
             alert("can't pay more than required")
           }else{
              if(pay_amount > b_amount){
                 alert('balance is not enought')
              }else{
+                
                 this.add_payment_btn = true;     
               
                 axios.post(this.$store.state.api_url + "/add_payment_to_student",{f_id,pay_amount,valid_to,student_id,user_id,role_id,b_amount,b_id,s_id,s_paid_amount,class_id,level_id,year}).then((response) => {
@@ -529,7 +579,8 @@ export default {
                   });
              }
           }
-      }
+        }
+        }  
     },
     addFeeToStudent(fee_id, fee_amount){
       
@@ -560,9 +611,42 @@ export default {
           this.add_remove_fee = false;
         });
     },
-    removeFeeToStudent(feepay){
-      console.log(feepay)
-      alert('mama rosh mashenz')
+    removeFeeSelect(feepay){
+       this.remove_fee = feepay;
+    },
+    removeFeeRequest(){
+        var r_fee = this.remove_fee
+        var reason = this.remove_reason
+
+        var fee_payment_id = r_fee.id
+        var fee_id = r_fee.f_id
+        var fee_name = r_fee.fee
+        var amount = r_fee.amount
+        var paid_amount = r_fee.paid_amount
+
+        ///general data
+        var student_id = this.student.id;
+        var user_id = this.user_id;
+        var role_id = this.role_id;
+        var year = this.accademic_year
+
+        this.remove_request_btn = true;
+
+        axios.post(this.$store.state.api_url + "/remove_fee_request",{fee_name,year,amount,paid_amount,student_id,fee_id,fee_payment_id,user_id,role_id,reason}).then((response) => {
+        if (response.data.success) {
+            alert(response.data.message);
+            this.remove_request_btn = false;
+
+        } else {
+            alert(response.data.message);
+            this.remove_request_btn = false;
+        }
+
+        }).catch((errors) => {
+          console.log(errors);
+          alert("Something goes wrong try again");
+          this.remove_request_btn = false;
+        });
     },
     allLevel() {
       axios.get(this.$store.state.api_url + "/levels").then((response) => {

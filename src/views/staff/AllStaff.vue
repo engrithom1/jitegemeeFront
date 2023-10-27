@@ -250,69 +250,48 @@
                       </div>
                     </form>
                   </div>
-                  <div class="inbox-body">
-                    <div class="mail-option">
-                      <ul class="unstyled inbox-pagination mb-3">
-                        <li><span>1-50 of 234</span></li>
-                        <li>
-                          <a class="np-btn" href="#"
-                            ><i class="fa fa-angle-left pagination-left"></i
-                          ></a>
-                        </li>
-                        <li>
-                          <a class="np-btn" href="#"
-                            ><i class="fa fa-angle-right pagination-right"></i
-                          ></a>
-                        </li>
-                      </ul>
-                      <div class="table-responsive-md w-100">
-                        <table class="table table-hover">
-                          <thead>
-                            <th><b>Username</b></th>
-                            <th><b>Full Name</b></th>
-                            <th><b>Phone</b></th>
-                            <th><b>Department</b></th>
-                            <th><b>Action</b></th>
-                          </thead>
-                          <tbody>
-                            <tr
-                              v-for="staff in staffs"
-                              :key="staff.id"
-                              class=""
-                            >
-                              <td :class="'text-' + staff.color">
-                                {{ staff.username }}
-                              </td>
-                              <td class="">
-                                {{
-                                  staff.initial +
-                                  " " +
-                                  staff.first_name +
-                                  " " +
-                                  staff.middle_name +
-                                  " " +
-                                  staff.last_name
-                                }}
-                              </td>
-                              <td class="">{{ staff.phone }}</td>
-                              <td class="">{{ staff.department }}</td>
-                              <td class="">
-                                <button
-                                  staff_id="{{ staff.id }}"
-                                  class="btn btn-primary btn-table mr-1"
-                                >
-                                  <i class="fa fa-edit"></i>
-                                </button>
-                                <button class="btn btn-info btn-table">
-                                  <i class="fa fa-eye"></i>
-                                </button>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                  <div class="full price_table padding_infor_info">
+                  <div class="row">
+                     <!-- column contact --> 
+                     <div v-for="staff in staffs" :key="staff.id" class="col-lg-4 col-md-6 col-sm-6 col-xs-12 profile_details margin_bottom_30">
+                          <div class="contact_blog">
+                            <h4 class="brief">{{ staff.department }}</h4>
+                            <div class="contact_inner">
+                                <div class="left">
+                                  <h3>{{ staff.initial+" "+staff.first_name+" "+staff.last_name }}</h3>
+                                </div>
+                                <div class="right">
+                                  <div class="profile_contacts">
+                                      <img class="img-responsive" :src="'/assets/images/logo/'+staff.photo" alt="#" />
+                                  </div>
+                                </div>
+                                <div class="bottom_list">
+                                  <ul class="list-unstyled">
+                                      <li><i class="fa fa-envelope-o"></i> : {{ staff.email }}</li>
+                                      <li><i class="fa fa-phone"></i> : {{ staff.phone }}</li>
+                                  </ul>
+                                  <div class="left_rating">
+                                      <p :class="'text-'+staff.color">
+                                        {{staff.role}}
+                                      </p>
+                                  </div>
+                                  <div class="right_button">
+                                      <button type="button" class="btn btn-success btn-xs mr-2"> <i class="fa fa-user">
+                                      </i> <i class="fa fa-comments-o"></i> 
+                                      </button>
+                                      <button type="button" class="btn btn-primary btn-xs">
+                                      <i class="fa fa-user"> </i> View Profile
+                                      </button>
+                                  </div>
+                                </div>
+                            </div>
+                          </div>
                       </div>
-                    </div>
+                      <!-- end column contact blog -->
                   </div>
+                </div>
+
+                  <!--kukazaaaa-->
                 </div>
               </div>
             </div>

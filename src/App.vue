@@ -39,7 +39,7 @@
                 <span>Dashboard</span></router-link
               >
             </li>
-            <li>
+            <li v-if="user.role_id > 2">
               <a
                 href="#admission"
                 data-toggle="collapse"
@@ -71,7 +71,7 @@
                 </li>
               </ul>
             </li>
-            <li>
+            <li v-if="user.role_id > 2">
               <a
                 href="#finance"
                 data-toggle="collapse"
@@ -91,14 +91,19 @@
                     >> <span>Student Payments</span></router-link
                   >
                 </li>
-                <li>
+                <li v-if="user.role_id > 3">
+                  <router-link to="/reconciliation"
+                    >> <span>Reconciliation</span></router-link
+                  >
+                </li>
+                <!--li>
                   <router-link to="/payment-reports"
                     >> <span>Payments Reports</span></router-link
                   >
-                </li>
+                </li-->
               </ul>
             </li>
-            <li>
+            <li v-if="user.role_id > 1">
               <a
                 href="#apps"
                 data-toggle="collapse"
@@ -132,22 +137,65 @@
                 <li>
                   <router-link to="/exams-results">> <span>Exam Results</span></router-link>
                 </li>
+                <li>
+                  <router-link to="/attendance"
+                    >> <span>Attendance</span></router-link
+                  >
+                </li>
               </ul>
             </li>
+            <li v-if="user.role_id == 1">
+              <router-link to="/student-fees-payments"
+                ><i class="fa fa-money purple_color2"></i>
+                <span>Fees Mayments</span></router-link
+              >
+            </li>
 
-            <li>
+            <li v-if="user.role_id == 1">
+              <router-link to="/student-exam-results"
+                ><i class="fa fa-graduation-cap blue2_color"></i>
+                <span>Exam Results</span></router-link
+              >
+            </li>
+
+            <li v-if="user.role_id == 1">
+              <router-link to="/student-class-mates"
+                ><i class="fa fa-users orange_color"></i>
+                <span>Class Mates</span></router-link
+              >
+            </li>
+            <li v-if="user.role_id == 1">
+              <router-link to="/student-teachers"
+                ><i class="fa fa-users green_color"></i>
+                <span>Teachers</span></router-link
+              >
+            </li>
+            <li v-if="user.role_id == 1">
+              <router-link to="/student-teachers"
+                ><i class="fa fa-calendar text-success"></i>
+                <span>Attendance</span></router-link
+              >
+            </li>
+
+            <li v-if="user.role_id > 1">
+              <router-link to="/student-info"
+                ><i class="fa fa-search-plus text-secondary"></i>
+                <span>Student Info</span></router-link
+              >
+            </li>
+            <li v-if="user.role_id > 1">
               <router-link to="/department"
                 ><i class="fa fa-file-text green_color"></i>
                 <span>Departments</span></router-link
               >
             </li>
-            <li>
+            <li v-if="user.role_id > 1">
               <router-link to="/all-staff"
                 ><i class="fa fa-briefcase blue1_color"></i>
                 <span>Staff</span></router-link
               >
             </li>
-            <li>
+            <!--li>
               <a
                 href="#calendar"
                 data-toggle="collapse"
@@ -164,8 +212,8 @@
                   <a href="media_gallery.html">> <span>Announcements</span></a>
                 </li>
               </ul>
-            </li>
-            <li>
+            </li-->
+            <li v-if="user.role_id > 1">
               <a href="contact.html">
                 <i class="fa fa-paper-plane red_color"></i>
                 <span>Contact</span></a
@@ -180,10 +228,10 @@
                 ><i class="fa fa-cog yellow_color"></i> <span>Settings</span></a
               >
               <ul class="collapse list-unstyled" id="setting">
-                <li>
+                <li v-if="user.role_id > 3">
                   <a href="dashboard.html">> <span>control</span></a>
                 </li>
-                <li>
+                <li v-if="user.role_id > 3">
                   <a href="dashboard.html">> <span>Logs</span></a>
                 </li>
                 <li>

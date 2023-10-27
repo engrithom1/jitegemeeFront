@@ -1,8 +1,6 @@
 <template>
     <div class="midde_cont">
-     
       <div class="container-fluid">
-
         <div class="row column_title">
           <div class="col-md-12">
             <div class="page_title">
@@ -18,9 +16,6 @@
             <div class="full progress_bar_inner">
               <div class="row">
                 <div class="col-md-12">
-                  <div class="inbox-body">
-                  <div class="mail-option">
-                    <div class="table-responsive-md w-100">
                     <form @submit.prevent="searchResults" class="p-3">
                     <div class="row">    
                     <div class="col-md-2 form-group">
@@ -78,9 +73,6 @@
                     <button type="submit" class="btn btn-success"><i class="fa fa-search"> </i> Results</button>
                     </div>
                   </form>
-                    </div>  
-                  </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -88,25 +80,23 @@
           </div>
         </div>
         <!--contents heaa-->
-        <!--add payments-->
-        <div class="row column4 graph">
-          <div class="col-12">
+        <!-- table section -->
+        <div class="row">
+          <div class="col-md-12">
             <div class="white_shd full margin_bottom_30">
-            <div class="full progress_bar_inner">
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="inbox-body">
-                  <div class="mail-option">
-                    <div v-show="this.results.length > 0" class="table-responsive-md w-100">
-                      <table class="table table-hover table-striped">
+                <div class="table_section padding_infor_info">
+                    <div class="table-responsive-sm">
+                    <table class="table">
                       <thead>
-                        <th><b>Index No</b></th>
+                        <tr>
+                          <th><b>Index No</b></th>
                         <th><b>Full Name</b></th>
                         <th><b>Avge</b></th>
                         <th><b>Pnts</b></th>
                         <th><b>Divs</b></th>
                         <th><b>Potn</b></th>
-                        <th style="width: 47%"><b>Subject Detailed</b></th>
+                        <th><b>Subject Detailed</b></th>
+                        </tr>
                       </thead>
                       <tbody>
                         <tr v-for="result in results" :key="result.index_no" class="">
@@ -121,26 +111,16 @@
                           <td v-else class="">FLD</td>
                           <td class=""></td>
                           <td class="">
-                           {{ result.details }}
+                            {{ result.details }}
                           </td>
                         </tr>
                       </tbody>
                     </table> 
-                    </div>
-                    <div v-show="this.results.length == 0" class="alert alert-danger">
-                        <p>No results, put data and fetch results above</p>
-                    </div>
-                       
-                  </div>
                   </div>
                 </div>
-              </div>
             </div>
-          </div>
-          </div>
-        </div>
-        <!--contents heaa-->
-
+          </div>  
+        </div>                 
       </div>
       <!-- footer -->
       <div class="container-fluid">

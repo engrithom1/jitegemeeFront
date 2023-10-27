@@ -376,6 +376,7 @@ export default {
         .then((response) => {
           if (response.data.success) {
             alert(response.data.message);
+            window.location.reload();
           } else {
             this.errors = response.data.message;
           }

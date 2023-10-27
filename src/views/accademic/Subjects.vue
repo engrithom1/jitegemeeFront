@@ -34,7 +34,7 @@
                   />
                 </div>
 
-                <button class="btn btn-success">Submit</button>
+                <button :disabled="this.form.role_id != 4" class="btn btn-success">Submit</button>
               </form>
             </div>
           </div>
@@ -67,7 +67,7 @@
                               {{ subject.subject }}
                             </td>
                             <td class="view-message">
-                              <button
+                              <button :disabled="this.form.role_id != 4"
                                 @click="getEdit(subject.id, subject.subject)"
                                 class="btn btn-sm btn-primary mr-1"
                                 data-toggle="modal"
@@ -75,7 +75,7 @@
                               >
                                 <i class="fa fa-edit"></i>
                               </button>
-                              <button
+                              <button :disabled="this.form.role_id != 4"
                                 class="btn btn-sm btn-danger"
                                 @click="
                                   deleteSubject(subject.id, subject.subject)

@@ -270,19 +270,23 @@
                             </select>
                           </div>
                           <div class="form-group">
-                            <label for="pgender">Accademic Year*</label>
-                            <input
-                              type="number"
-                              v-max="this.c_year+2"
-                              maxlength="4"
-                              minlength="4"
+                            <label for="pgender">Parental Status*</label>
+                            <select
+                              v-model="this.form.parent_status_id"
                               class="form-control"
-                              :placeholder="this.c_year"
-                              v-model="this.form.accademic_year"
-                              aria-describedby="emailHelp"
                               required
-                            />
+                            >
+                              <option
+                                class="text-capitalize"
+                                v-for="parent_s in parent_ss"
+                                :key="parent_s.id"
+                                :value="parent_s.id"
+                              >
+                                {{ parent_s.parent_status }}
+                              </option>
+                            </select>
                           </div>
+                          
                           
                         </div>
                         <div class="col-sm-12 col-md-6">
@@ -378,7 +382,7 @@
                               </option>
                             </select>
                           </div>
-                          <div class="form-group">
+                          <!--div class="form-group">
                             <label for="pgender">Level*</label>
                             <select
                               class="form-control"
@@ -411,6 +415,20 @@
                                 {{ clasz.classname }}
                               </option>
                             </select>
+                          </div-->
+                          <div class="form-group">
+                            <label for="pgender">Accademic Year*</label>
+                            <input
+                              type="number"
+                              v-max="this.c_year+2"
+                              maxlength="4"
+                              minlength="4"
+                              class="form-control"
+                              :placeholder="this.c_year"
+                              v-model="this.form.accademic_year"
+                              aria-describedby="emailHelp"
+                              required
+                            />
                           </div>
                         </div>
                       </div>
@@ -507,6 +525,7 @@ export default {
       clazzs: [],
       parent: {},
       parents: [],
+      parent_ss: [],
       errors: [],
       relations: [],
       adm_types:[],
@@ -532,9 +551,10 @@ export default {
         school_from: "",
         transfer_reason: "",
         relation_to: "",
-        level_id: "",
-        classroom_id: "",
+        level_id: 0,
+        classroom_id: 0,
         user_id: "",
+        parent_status_id:"",
         role_id: "",
         entry: "",
         admission: "",
@@ -606,6 +626,12 @@ export default {
         this.parents = response.data;
       });
     },
+    allParentStatus() {
+      axios.get(this.$store.state.api_url + "/parent-status").then((response) => {
+        //console.log(response.data);
+        this.parent_ss = response.data;
+      });
+    },
     getGender() {
       axios.get(this.$store.state.api_url + "/genders").then((response) => {
         //console.log(response.data);
@@ -658,6 +684,7 @@ export default {
               this.parent_exist = false;
               this.parent = {};
               alert(response.data.message);
+              window.location.reload();
             } else {
               this.errors = response.data.message;
             }
@@ -716,6 +743,7 @@ export default {
     this.getEntryType();
     this.allLevel();
     this.allClaszs();
+    this.allParentStatus();
     this.isAuth();
   },
 };

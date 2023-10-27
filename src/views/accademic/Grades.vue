@@ -112,7 +112,7 @@
                   />
                 </div>
 
-                <button class="btn btn-success">Submit</button>
+                <button :disabled="this.form.role_id != 4" class="btn btn-success">Submit</button>
               </form>
             </div>
           </div>
@@ -149,7 +149,7 @@
                             <td class="">{{ grade.point }}</td>
                             <td class="">{{ grade.grade_label }}</td>
                             <td class="">
-                              <button
+                              <button :disabled="this.form.role_id != 4"
                                 @click="
                                   getEdit(
                                     grade.id,
@@ -166,7 +166,7 @@
                               >
                                 <i class="fa fa-edit"></i>
                               </button>
-                              <button
+                              <button :disabled="this.form.role_id != 4"
                                 class="btn btn-sm btn-danger"
                                 @click="deleteGrade(grade.id, grade.grade)"
                               >

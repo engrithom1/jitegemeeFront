@@ -14,17 +14,28 @@ import Subjects from "../views/accademic/Subjects.vue"
 import Exams from "../views/accademic/Exams.vue"
 import ExamMarks from "../views/accademic/StudentMarks.vue"
 import ExamResults from "../views/accademic/ExamResults.vue"
+import Attendance from "../views/accademic/Attendance.vue"
 
 //finance
 import StudentFees from "../views/finance/StudentFees.vue"
 import StudentPayments from "../views/finance/StudentPayments.vue"
 import PaymentReports from "../views/finance/PaymentReports.vue"
+import Reconciliation from "../views/finance/Reconciliation.vue"
 
 //statff
 import AllStaff from "../views/staff/AllStaff.vue"
 
 //Department
 import Department from "../views/department/Department.vue"
+
+//student info
+import StudentInfo from "../views/student_pages/StudentInfo.vue"
+
+//students pages
+import Teachers from "../views/student_pages/Teachers.vue"
+import Mates from "../views/student_pages/Mates.vue"
+import Results from "../views/student_pages/Results.vue"
+import Payments from "../views/student_pages/Payments.vue"
 
 import Dev from "../views/Dev.vue"
 
@@ -119,6 +130,45 @@ const routes = [
     name: 'ExamResults',
     component: ExamResults
   },
+  {
+    path: '/attendance',
+    name: 'Attendance',
+    component: Attendance
+  },
+
+  {
+    path: '/reconciliation',
+    name: 'Reconciliation',
+    component: Reconciliation
+  },
+  ///students pages student-fees-payments
+  {
+    path: '/student-info',
+    name: 'StudentInfo',
+    component: StudentInfo
+  },
+  {
+    path: '/student-fees-payments',
+    name: 'Payments',
+    component: Payments
+  },
+  {
+    path: '/student-class-mates',
+    name: 'Mates',
+    component: Mates
+  },
+  {
+    path: '/student-exam-results',
+    name: 'Results',
+    component: Results
+  },
+  {
+    path: '/student-teachers',
+    name: 'Teachers',
+    component: Teachers
+  },
+
+
   
 ]
 
