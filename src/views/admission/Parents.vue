@@ -207,20 +207,22 @@
                       class="pull-right position search_inbox"
                     >
                       <p
-                        v-for="error in errors"
+                        v-for="error in search_errors"
                         :key="error"
                         class="text-danger"
                       >
-                        {{ error[0] }}
+                        {{ error }}
                       </p>
+                    
                       <div class="input-append">
                         <input
                           type="text"
                           class="sr-input"
                           v-model="this.search.search_parent"
-                          placeholder="Search parent"
+                          placeholder="Search phone / name"
+                          required
                         />
-                        <button class="btn sr-btn" type="submit">
+                        <button :disabled="this.loading" class="btn sr-btn" type="submit">
                           <i class="fa fa-search"></i>
                         </button>
                       </div>
@@ -228,32 +230,27 @@
                   </div>
                   <div class="inbox-body">
                     <div class="mail-option">
-                      <ul class="unstyled inbox-pagination mb-3">
-                        <li><span>1-50 of 234</span></li>
-                        <li>
-                          <a class="np-btn" href="#"
-                            ><i class="fa fa-angle-left pagination-left"></i
-                          ></a>
-                        </li>
-                        <li>
-                          <a class="np-btn" href="#"
-                            ><i class="fa fa-angle-right pagination-right"></i
-                          ></a>
-                        </li>
-                      </ul>
                       <div class="table-responsive-md w-100">
-                        <table class="table table-hover">
+                
+                        <div v-if="this.loading" class="container mt-5 mb-5">
+                          <div class="row">
+                            <div class="span2"></div>
+                            <div class="span4">
+                              <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                        </div> 
+                        
+                        <table v-if="!this.loading" class="table table-hover">
                           <thead>
                             <th><b>Full Name</b></th>
                             <th><b>Phone</b></th>
-                            <th><b>Gendar</b></th>
                             <th><b>Home Address</b></th>
                             <th><b>Action</b></th>
                           </thead>
+                          
                           <tbody>
-                            <div v-show="parents.length == 0">
-                              <h4 class="text-center">no parents found</h4>
-                            </div>
                             <tr
                               v-show="parents"
                               v-for="parent in parents"
@@ -270,7 +267,6 @@
                                 }}
                               </td>
                               <td class="">{{ parent.phone }}</td>
-                              <td class="">{{ parent.gender }}</td>
                               <td :class="'text-' + parent.color">
                                 {{ parent.home_address }}
                               </td>
@@ -288,6 +284,17 @@
                             </tr>
                           </tbody>
                         </table>
+                        <div v-if="!this.loading">
+                          <div v-if="this.parents.length == 0" class="container">
+                            <div class="row">
+                              <div class="span2"></div>
+                              <div class="span4">
+                                <h5 class="text-capitalize text-danger">Not Parent Found</h5>
+                              </div>
+                              <div class="span4"></div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -309,12 +316,12 @@
 </template>
 <script>
 import axios from "axios";
-//import Form from "vform";
 
 export default {
   data() {
     return {
       add_parent: true,
+      loading:true,
       parents: [],
       errors: [],
       search_errors: [],
@@ -349,24 +356,32 @@ export default {
       });
     },
     searchParent() {
+      this.loading = true;
+      this.search_errors = []
       axios
         .post(this.$store.state.api_url + "/search-parent", this.search)
         .then((response) => {
+          this.loading = false;
           if (response.data.success) {
             this.parents = response.data.parents;
-            console.log(response.data.parents);
+            //console.log(response.data.parents);
+            
           } else {
+           
             this.search_errors = response.data.message;
           }
         })
         .catch((errors) => {
-          alert("Network or Server Errors");
+          
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     allParents() {
       axios.get(this.$store.state.api_url + "/parents").then((response) => {
-        console.log(response.data);
+        //console.log(response.data);
         this.parents = response.data;
+        this.loading = false;
       });
     },
     addParent() {
@@ -375,21 +390,24 @@ export default {
         .post(this.$store.state.api_url + "/create-parent", this.form)
         .then((response) => {
           if (response.data.success) {
-            alert(response.data.message);
+           
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
             window.location.reload();
+
           } else {
-            this.errors = response.data.message;
+            this.errors = [response.data.message];
           }
         })
         .catch((errors) => {
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     imageProcess(e) {
       let file = e.target.files[0];
       let reader = new FileReader();
 
-      alert("well it chabged");
 
       if (file["size"] < 1111775) {
         reader.onloadend = (file) => {
@@ -398,7 +416,7 @@ export default {
         };
         reader.readAsDataURL(file);
       } else {
-        alert("You have Choose The file more than 2MB");
+      
         //swal("Congrats!", ", Your account is created!", "success");
       }
     },

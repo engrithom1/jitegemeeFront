@@ -87,7 +87,15 @@
                 <div class="col-md-12">
                   <div class="inbox-body">
                     <div class="mail-option">
-                      <table class="table table-inbox table-hover">
+                      <div v-if="this.loading" class="container mt-5 mb-5">
+                          <div class="row">
+                            <div class="span4">
+                              <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                      </div>
+                      <table v-if="!this.loading" class="table table-inbox table-hover">
                         <thead>
                           <th><b>Fee Name</b></th>
                           <th><b>Amount</b></th>
@@ -136,6 +144,17 @@
                           </tr>
                         </tbody>
                       </table>
+                      <div v-if="!this.loading">
+                        <div v-if="this.fees.length == 0" class="container">
+                          <div class="row">
+                            <div class="span2"></div>
+                            <div class="span4">
+                              <h5 class="text-capitalize text-danger">Not Fee Found</h5>
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -154,7 +173,7 @@
     </div>
   </div>
   <!-- The Modal -->
-  <div class="modal fade" id="edit-modal">
+  <div class="modal fade" data-backdrop="static" data-keyboard="false" id="edit-modal">
     <div class="modal-dialog">
       <div class="modal-content">
         <!-- Modal Header -->
@@ -243,6 +262,7 @@ export default {
       fees: [],
       errors: [],
       edit_errors: [],
+      loading:true,
       min_amount_bool:false,
       min_amount_edit_bool:false,
       form: {
@@ -282,6 +302,7 @@ export default {
       axios.get(this.$store.state.api_url + "/fees").then((response) => {
         //console.log(response.data);
         this.fees = response.data;
+        this.loading = false;
       });
     },
     getEdit(id, fee, amount, min_amount, duration) {
@@ -306,14 +327,16 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.fees = response.data.fees;
-            alert(response.data.message);
+           
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
             this.errors = response.data.message;
           }
         })
         .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     updateFee() {
@@ -333,14 +356,16 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.fees = response.data.fees;
-            alert(response.data.message);
+           
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
             this.edit_errors = response.data.message;
           }
         })
         .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     deleteFee(id, fee) {
@@ -356,14 +381,17 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.fees = response.data.fees;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
           }
         })
         .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
+          //console.log(errors);
+            var message = "Network or Server Errors";
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
         });
     },
     isAuth() {

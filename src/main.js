@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-//import Toaster from "@meforma/vue-toaster";
+import Toaster from "vue-toast-notification";
+//import VueSweetalert2 from 'vue-sweetalert2';
+//import 'sweetalert2/dist/sweetalert2.min.css';
 
 import router from './router'
 import store from './store/index'
@@ -12,6 +14,7 @@ window.$ = window.jQuery = require('jquery');
 
 createApp(App)
 .use(router)
-//.use(Toaster,{position: "top-right"})
+//.use(VueSweetalert2)
+.use(Toaster,{position: "top-right"})
 .use(store)
 .mount('#app')

@@ -12,7 +12,7 @@
                 </div>
             </div>
             <!--contents heaa-->
-            <div v-if="!find_student" class="row column4 graph">
+            <div v-if="!find_student" class="row column4 graph" >
                 <div class="col-sm-6">
                     <div class="white_shd full margin_bottom_30">
                         <div class="full graph_head">
@@ -32,9 +32,9 @@
                                         <form @submit.prevent="searchStudentInfo"
                                             class="pull-right position search_inbox">
                                             <div class="input-append">
-                                                <input type="text" minlength="4" maxlength="6"
+                                                <input type="text" minlength="6" maxlength="6"
                                                     v-model="this.search_index_no" class="sr-input"
-                                                    placeholder="0001" />
+                                                    placeholder="400000" />
                                                 <button :disabled="find_btn" class="btn sr-btn" type="submit">
                                                     <i class="fa fa-search"></i>
                                                 </button>
@@ -46,11 +46,21 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-sm-6">
+                    <div v-if="this.search_loading" class="container mt-5 mb-5">
+                        <div class="row">
+                          <div class="span4">
+                            <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                          </div>
+                          <div class="span4"></div>
+                        </div>
+                      </div>
+                </div>
             </div>
   
   
            
-            <div class="" v-if="find_student">
+            <div class="" v-if="find_student" >
                  <!--student details-->
                 <div class="row column4 graph">
                     <div class="col-sm-12">
@@ -66,20 +76,27 @@
                                  <div class="invoice_inner">
                                     <div class="row  m-3">
                                        <div class="col-md-4">
+                                        
                                           <div class="full invoice_blog">
                                              <h4>Personal</h4>
-                                             <p><strong>Pluto Admin</strong><br>  
-                                                427 Schoen Circles Suite 124<br> 
-                                                Melbourne Australia<br>    
-                                                <strong>Phone : </strong><a href="tel:9876543210">9876 543 210</a><br>  
-                                                <strong>Email : </strong><a href="mailto:yourmail@gmail.com">Yourmail@gmail.com</a>
+                                             <img class="img-responsive float-right" :src="'/assets/images/logo/'+student.photo" width='40%' alt="no image">
+                                             <p><strong>{{student.first_name+" "+student.middle_name+" "+student.last_name}}</strong><br>  
+                                                {{ student.nationality }}, {{ student.gender }}<br> 
+                                                {{ student.home_address }}<br>
+                                                <strong>Birth date : </strong>{{student.birth_date}}<br>    
+                                                <strong>Health : </strong>{{student.health}}<br>  
+                                                <strong>Contacts : </strong>{{ student.phone+", "+student.email }}
                                              </p>
                                           </div>
                                        </div>
                                        <div class="col-md-4">
+                                        
                                           <div class="full invoice_blog">
                                              <h4>Admission</h4>
-                                             <p><strong>David Roman</strong><br>  
+                                            <div v-if="this.admission_loading" class="container mt-5 mb-5">
+                                                <img class="center-block" width="250" src="/assets/images/loading/cupertino.gif" alt="#" />
+                                            </div>
+                                             <p v-if="!admission_loading"><strong>David Roman</strong><br>  
                                                 427 Schoen Circles Suite 124<br> 
                                                 Melbourne Australia<br>    
                                                 <strong>Phone : </strong><a href="tel:9876543210">9876 543 210</a><br>  
@@ -90,7 +107,10 @@
                                        <div class="col-md-4">
                                           <div class="full invoice_blog">
                                              <h4>Parents </h4>
-                                             <p><strong>Order ID : </strong>5b6R9C<br> 
+                                            <div v-if="this.parent_loading" class="container mt-5 mb-5">
+                                                <img class="center-block" width="250" src="/assets/images/loading/cupertino.gif" alt="#" />
+                                            </div>
+                                             <p v-if="!parent_loading"><strong>Order ID : </strong>5b6R9C<br> 
                                                 <strong>Payment Due : </strong>July/18/2018<br> 
                                                 <strong>Account : </strong>254-55847
                                              </p>
@@ -158,10 +178,10 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                            <th>Qty</th>
+                                            <th width="200px">Qty</th>
                                             <th>Product</th>
                                             <th>Serial #</th>
-                                            <th>Description</th>
+                                            <th width="600px !important">Description</th>
                                             <th>Subtotal</th>
                                             </tr>
                                         </thead>
@@ -229,10 +249,10 @@
                                             alt="" />
                                     </div>
                                     <div class="ml-3">
-                                        <p class="text-capitalize">Index Number: S.1234.{{ student.index_no }}</p>
-                                        <p class="text-capitalize">Name: {{ student.first_name+" "+student.middle_name+" "+student.last_name }}</p>
-                                        <p class="text-capitalize">Admmited Year: {{ student.accademic_year }}</p>
-                                        <p class="text-capitalize">Status: {{ student.status_name }}</p>
+                                        <p class="text-capitalize">Index Number: </p>
+                                        <p class="text-capitalize">Name: </p>
+                                        <p class="text-capitalize">Admmited Year: </p>
+                                        <p class="text-capitalize">Status: </p>
                                     </div>
                                 </div>
                             </div>
@@ -259,10 +279,10 @@
                                             alt="" />
                                     </div>
                                     <div class="ml-3">
-                                        <p class="text-capitalize">Index Number: S.1234.{{ student.index_no }}</p>
-                                        <p class="text-capitalize">Name: {{ student.first_name+" "+student.middle_name+" "+student.last_name }}</p>
-                                        <p class="text-capitalize">Admmited Year: {{ student.accademic_year }}</p>
-                                        <p class="text-capitalize">Status: {{ student.status_name }}</p>
+                                        <p class="text-capitalize">Index Number: </p>
+                                        <p class="text-capitalize">Name:</p>
+                                        <p class="text-capitalize">Admmited Year: </p>
+                                        <p class="text-capitalize">Status: </p>
                                     </div>
                                 </div>
                             </div>
@@ -294,6 +314,9 @@
       return {
         find_student: false,
         find_btn: false,
+        search_loading:false,
+        parent_loading:true,
+        admission_loading:true,
         ////basic
         user_id:"",
         role_id:"",
@@ -306,22 +329,31 @@
     methods: {
     searchStudentInfo() {
       this.index_no_erro = ""
-
+      this.search_loading = true
       var index_no = this.search_index_no
 
-      if(index_no > 0 && index_no < 100000){
+      if(index_no > 0 && index_no < 1000000){
         this.find_btn = true,
 
-        axios.post(this.$store.state.api_url + "/search_student_info",{'index_no':index_no}).then((response) => {
+        axios.post(this.$store.state.api_url + "/search_student_personal_info",{'index_no':index_no}).then((response) => {
         
-        if(response.data.success){
+
+        this.search_loading = false
+        this.find_btn = false
+        
+        if(response.data.success && response.data.student != null){
           this.student = response.data.student
           this.find_student = true
-          this.find_btn = false
+          
         }else{
           this.index_no_erro = "Not student found, Enter correct index no"
-          this.find_btn = false
+         
         }
+        }).catch((errors) => {
+          //console.log(errors);
+          
+          var message = "Network or Server Errors"
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
       
       }else{

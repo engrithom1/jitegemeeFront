@@ -69,6 +69,14 @@
                                 </div>  
                               </div>
                               <form @submit.prevent="submitAttendance">
+                                <div v-if="this.loading" class="container mt-5 mb-5">
+                                    <div class="row">
+                                      <div class="span4">
+                                        <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                                      </div>
+                                      <div class="span4"></div>
+                                    </div>
+                                </div>
                                 <table class="table table-inbox table-hover">
                                   <tbody>
                                       <tr   v-for="student in students"
@@ -77,21 +85,57 @@
                                             <input :value="student.id" type="checkbox" v-model="this.present_students" :id="'s_'+student.index_no">
                                             <label class="ml-3" :for="'s_'+student.index_no">{{student.first_name+" "+student.middle_name+" "+student.last_name}}</label>
                                         </td>
-                                        <td class="view-message" >S.1234.{{ student.index_no }}</td>
+                                        <td class="view-message" >{{ student.index_no }}</td>
                                         
                                       </tr>
 
                                       <div v-if="students.length > 0" class="row m-2">
+                                     
                                         <div class="form-group">
-                                          <input type="date" class="form-control" v-model="this.date_att" id="">
+                                          <input type="date" required class="form-control" v-model="this.date_att" id="">
+                                        </div>
+
+                                        <div v-if="this.teacher_id == this.user_id" class="col-md-3 col-sm-6 form-group">
+                                          <select required v-on:change="levelSelected()" class="form-control" v-model="this.att_type">
+                                          <option value="" disabled selected>Attendance type</option>
+                                          <option value="3">Both</option>
+                                          <option value="2">Class Attendance</option>
+                                          <option value="1">Session Attendance</option>
+                                          </select>
+                                        </div>
+
+                                        <div v-if="att_type == 1 || att_type == 3" class="col-md-3 col-sm-6 form-group">
+                                          <select required v-on:change="levelSelected()" class="form-control" v-model="this.att_subject">
+                                          <option value="" disabled selected>Choose subject</option>
+                                          <option
+                                            class="text-capitalize"
+                                            v-for="subject in subjects"
+                                            :key="subject.id"
+                                            :value="subject.id"
+                                            
+                                          >
+                                            {{ subject.subject }}
+                                          </option>
+                                          </select>
                                         </div>
                                       
-                                        <div class="form-group">
-                                          <button :disabled="attendance_btn" class="btn btn-success ml-3">Submit</button>
+                                        <div class="col-md-3 col-sm-6 form-group">
+                                          <button :disabled="attendance_btn" class="btn btn-success w-100">Submit</button>
                                         </div>
                                       </div>
                                   </tbody>
                                 </table>
+                                <div v-if="!this.loading">
+                                  <div v-if="this.students.length == 0" class="container">
+                                    <div class="row">
+                                      <div class="span2"></div>
+                                      <div class="span4">
+                                        <h5 class="text-capitalize text-danger">Not Students Found</h5>
+                                      </div>
+                                      <div class="span4"></div>
+                                    </div>
+                                  </div>
+                                </div>
                               </form>
                           </div>
                         </aside>
@@ -129,16 +173,16 @@
                                         </select>
                                       </div>
                                       <div class="col-md-3 col-sm-6 form-group">
-                                        <input type="date" class="form-control" v-model="this.date_from" id="">
+                                        <input required type="date" class="form-control" v-model="this.date_from" id="">
                                       </div>
                                       <div class="col-md-3 col-sm-6 form-group">
-                                        <input type="date" class="form-control" v-model="this.date_to" id="">
+                                        <input required type="date" class="form-control" v-model="this.date_to" id="">
                                       </div>
                                       <div class="col-md-3 col-sm-6 form-group">
                                         <button :disabled="records_btn" type="submit" class="btn btn-success form-control"><i class="fa fa-search"> </i> Records</button>
                                       </div>
                                       <div class="col-md-3 col-sm-6 form-group">
-                                        <input type="text"  placeholder="name or index" class="form-control" v-model="search_index_name" id="">
+                                        <!--input type="text"  placeholder="name or index" class="form-control" v-model="search_index_name" id=""-->
                                       </div>
                                       <div class="col-md-3 col-sm-6 form-group">
                                         <select :disabled="og_a_students.length == 0" v-on:change="selectPresence()" class="form-control" v-model="this.presence">
@@ -162,7 +206,7 @@
                                     <td class="">
                                         {{a_student.first_name+" "+a_student.middle_name+" "+a_student.last_name}}
                                     </td>
-                                    <td class="" >S.1234.{{ a_student.index_no }}</td>
+                                    <td class="" >{{ a_student.index_no }}</td>
                                     <td v-if="a_student.attend == 1" class="text-success" >Present</td>
                                     <td v-else class="text-danger" >Absent</td>  
                                   </tr>
@@ -213,6 +257,8 @@
         date_to:"",
         search_index_name:"",
         presence:2,
+        att_type:1,//1 = session, 2= class, 3 both
+        att_subject:0,//subject_id
         ///general
         levels: [],
         students:[],
@@ -224,10 +270,14 @@
         exam_id:"",
         role_id:"",
         class_id:"",
+        subs_idz:"",
+        teacher_id:"",
         level_id:"",
         search_class:true,
+        loading:false,
         fail_mark:"",
-        allclass:[]
+        allclass:[],
+        subjects:[]
       }
     },
     methods:{
@@ -305,10 +355,15 @@
     },
     classSelected(){
       this.search_class = false;
+      var class_id = this.class_id
+
+      let a_class = this.allclass.filter((i) => i.id === class_id);
+
+      this.subs_idz = a_class[0].subjects
+      this.teacher_id = a_class[0].teacher_id
     },
     getAttendanceRecords(){
-     
-     
+
      var class_id = this.class_id;
      var role_id = this.role_id;
 
@@ -332,7 +387,8 @@
 
 
      if(date_from > date_to){
-          alert('The first date on range must be less or equal to the second')
+          var message = 'The first date on range must be less or equal to the second';
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
           this.records_btn = false;
      }else{
         
@@ -341,21 +397,26 @@
         console.log(response.data);
         if (response.data.success) {
 
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
 
             this.og_a_students = response.data.a_students
             this.a_students = response.data.a_students
             this.records_btn = false;
+            
 
         } else {
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
             this.records_btn = false;
         }
 
         }).catch((errors) => {
           console.log(errors);
           this.records_btn = false;
-          alert("Something goes wrong try again");
+          
+            var message = "Something goes wrong try again";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     }
  },
@@ -366,6 +427,9 @@
         var level_id = this.level_id;
         var user_id = this.user_id;
         var role_id = this.role_id;
+
+        var att_type = parseInt(this.att_type)
+        var subject_id = this.att_subject
 
         var ps = this.present_students;
         var data_att = this.date_att
@@ -391,16 +455,25 @@
         var data_day = d_year+""+month+""+day
 
         if(data_att > data_day){
-          alert('you cant do it before the date')
+          
+          var message = "you cant do it before the date";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+          
           this.attendance_btn = false;
         }else{
           if(data_att < data_day - 7){
-            alert('its too late, 7 days after the date')
+           
+            var message = "its too late, 7 days after the date";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
             this.attendance_btn = false;
           }else{
 
-            var att = []
-
+            var class_att = []
+            var session_att = []
+          
+            if(att_type == 2){
+            /////general class attendance//////////
+           
             students.forEach(function (student) {
                 var obj = {
                   'student_id':student.id,
@@ -413,33 +486,113 @@
                   'attend':0,
                 }
 
-                att.push(obj)
+                class_att.push(obj)
             });
            
             ps.forEach(function(p){
-              var o_att = att.findIndex((ob => ob.student_id == p))
-              att[o_att].attend = 1
+              var o_att = class_att.findIndex((ob => ob.student_id == p))
+              class_att[o_att].attend = 1
             })
+            ///////ends general class atendance
+            }
 
-            axios.post(this.$store.state.api_url + "/submit_attendance",{role_id,att,class_id,data_att}).then((response) => {
+            if(att_type == 1){
+            /////session attendance//////////
+           
+            students.forEach(function (student) {
+                var obj = {
+                  'student_id':student.id,
+                  'subject_id':subject_id,
+                  'year':year,
+                  'date_att':data_att_4u,
+                  'date_no':data_att,
+                  'classroom_id':class_id,
+                  'level_id':level_id,
+                  'user_id':user_id,
+                  'attend':0,
+                }
+
+                session_att.push(obj)
+            });
+           
+            ps.forEach(function(p){
+              var o_att = session_att.findIndex((ob => ob.student_id == p))
+              session_att[o_att].attend = 1
+            })
+            ///////ends session atendance
+            }
+
+            if(att_type == 3){
+            /////session attendance//////////
+           
+            students.forEach(function (student) {
+                var obj = {
+                  'student_id':student.id,
+                  'subject_id':subject_id,
+                  'year':year,
+                  'date_att':data_att_4u,
+                  'date_no':data_att,
+                  'classroom_id':class_id,
+                  'level_id':level_id,
+                  'user_id':user_id,
+                  'attend':0,
+                }
+
+                session_att.push(obj)
+            });
+           
+            ps.forEach(function(p){
+              var o_att = session_att.findIndex((ob => ob.student_id == p))
+              session_att[o_att].attend = 1
+            })
+            ///////ends session atendance
+
+             /////general class attendance//////////
+           
+             students.forEach(function (student) {
+                var obj = {
+                  'student_id':student.id,
+                  'year':year,
+                  'date_att':data_att_4u,
+                  'date_no':data_att,
+                  'classroom_id':class_id,
+                  'level_id':level_id,
+                  'user_id':user_id,
+                  'attend':0,
+                }
+
+                class_att.push(obj)
+            });
+           
+            ps.forEach(function(p){
+              var o_att = class_att.findIndex((ob => ob.student_id == p))
+              class_att[o_att].attend = 1
+            })
+            ///////ends general class atendance
+            }
+
+            axios.post(this.$store.state.api_url + "/submit_attendance",{role_id,subject_id,att_type,class_att,session_att,class_id,data_att}).then((response) => {
         
             console.log(response.data);
             if (response.data.success) {
 
-                alert(response.data.message);
+                var message = response.data.message;
+                this.$toast.success(message,{duration: 7000,dismissible: true,})
                 this.date_att = "";
                 this.present_students = []
                 this.attendance_btn = false;
 
             } else {
-                alert(response.data.message);
+                var message = response.data.message;
+                this.$toast.error(message,{duration: 7000,dismissible: true,})
                 this.attendance_btn = false;
             }
 
             }).catch((errors) => {
-              console.log(errors);
+              //console.log(errors);
               this.attendance_btn = false;
-              alert("Something goes wrong try again");
+              var message = "Something goes wrong try again";
+              this.$toast.success(message,{duration: 7000,dismissible: true,})
             });
           }
         }
@@ -449,22 +602,36 @@
         var class_id = this.class_id;
 
         this.search_btn = true;
+        this.loading = true;
 
         axios.post(this.$store.state.api_url + "/get_class_students",{'class_id':class_id}).then((response) => {
         
-        console.log(response.data);
+        //console.log(response.data);
         if (response.data.success) {
             this.students = response.data.students;
             this.search_btn = false;
+            this.loading = false;
+
+             ///get subjects for a class
+            var subs_idz = this.subs_idz 
+            axios.post(this.$store.state.api_url + "/class_subjects",{subs_idz}).then((response) => {
+              //console.log(response.data);
+              this.subjects = response.data;
+            });
+
+
         } else {
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
             this.search_btn = false;
         }
 
         }).catch((errors) => {
           console.log(errors);
           this.search_btn = false;
-          alert("Something goes wrong try again");
+          var message = "Something goes wrong try again";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+          
         });
     },
     },

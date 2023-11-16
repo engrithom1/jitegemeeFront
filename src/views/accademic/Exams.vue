@@ -29,6 +29,7 @@
                     type="text"
                     class="form-control"
                     id="examname"
+                    required
                     v-model="this.form.examname"
                     placeholder="Test 3"
                     aria-describedby="emailHelp"
@@ -53,14 +54,22 @@
                 <div class="col-md-12">
                   <div class="inbox-body">
                     <div class="mail-option">
-                      <table class="table table-inbox table-hover">
+                      <div v-if="this.loading" class="container mt-5 mb-5">
+                          <div class="row">
+                            <div class="span4">
+                              <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                      </div>
+                      <table v-if="!this.loading" class="table table-inbox table-hover">
                         <thead>
                           <th><b>Exams Name</b></th>
                           <th><b>Action</b></th>
                         </thead>
                         <tbody>
                           <tr v-for="exam in exams" :key="exam.id" class="">
-                            <td class="">
+                            <td class="text-capitalize">
                               {{ exam.examname }}
                             </td>
                             <td class="view-message">
@@ -82,6 +91,18 @@
                           </tr>
                         </tbody>
                       </table>
+
+                      <div v-if="!this.loading">
+                        <div v-if="this.exams.length == 0" class="container">
+                          <div class="row">
+                            <div class="span2"></div>
+                            <div class="span4">
+                              <h5 class="text-capitalize text-danger">Not Exam Found</h5>
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -100,7 +121,7 @@
     </div>
   </div>
   <!-- The Modal -->
-  <div class="modal fade" id="edit-modal">
+  <div class="modal fade" data-backdrop="static" data-keyboard="false" id="edit-modal">
     <div class="modal-dialog">
       <div class="modal-content">
         <!-- Modal Header -->
@@ -150,6 +171,7 @@ export default {
       exams: [],
       errors: [],
       edit_errors: [],
+      loading:true,
       form: {
         examname: "",
         role_id: "",
@@ -165,6 +187,7 @@ export default {
       axios.get(this.$store.state.api_url + "/exams").then((response) => {
         //console.log(response.data);
         this.exams = response.data;
+        this.loading = false
       });
     },
     getEdit(id, examname) {
@@ -180,14 +203,16 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.exams = response.data.exams;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,}) 
           } else {
             this.errors = response.data.message;
+            
           }
         })
         .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     updateExam() {
@@ -204,14 +229,16 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.exams = response.data.exams;
-            alert(response.data.message);
+           
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,}) 
           } else {
-            this.edit_errors = response.data.message;
+            this.edit_errors = [response.data.message];
           }
         })
         .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     deleteExam(id, exam) {
@@ -227,14 +254,16 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.exams = response.data.exams;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,}) 
           } else {
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,}) 
           }
         })
         .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     isAuth() {

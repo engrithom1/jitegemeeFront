@@ -130,7 +130,15 @@
                 <div class="col-md-12">
                   <div class="inbox-body">
                     <div class="mail-option">
-                      <table class="table table-inbox table-hover">
+                      <div v-if="this.loading" class="container mt-5 mb-5">
+                          <div class="row">
+                            <div class="span4">
+                              <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                      </div>
+                      <table v-if="!this.loading" class="table table-inbox table-hover">
                         <thead>
                           <th><b>Level</b></th>
                           <th><b>Marks</b></th>
@@ -176,6 +184,17 @@
                           </tr>
                         </tbody>
                       </table>
+                      <div v-if="!this.loading">
+                        <div v-if="this.grades.length == 0" class="container">
+                          <div class="row">
+                            <div class="span2"></div>
+                            <div class="span4">
+                              <h5 class="text-capitalize text-danger">Not Grade Found</h5>
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -194,7 +213,7 @@
     </div>
   </div>
   <!-- The Modal -->
-  <div class="modal fade" id="edit-modal">
+  <div class="modal fade" data-backdrop="static" data-keyboard="false" id="edit-modal">
     <div class="modal-dialog">
       <div class="modal-content">
         <!-- Modal Header -->
@@ -306,6 +325,7 @@ export default {
       levels: [],
       errors: [],
       edit_errors: [],
+      loading:true,
       form: {
         grade: "",
         grade_label: "",
@@ -328,8 +348,9 @@ export default {
   methods: {
     allGrades() {
       axios.get(this.$store.state.api_url + "/grades").then((response) => {
-        console.log(response.data);
+        //console.log(response.data);
         this.grades = response.data;
+        this.loading = false
       });
     },
     allLevel() {
@@ -355,14 +376,16 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.grades = response.data.grades;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
-            this.errors = response.data.message;
+            this.errors = [response.data.message];
           }
         })
         .catch((errors) => {
           console.log(errors);
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     updateClass() {
@@ -383,14 +406,16 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.grades = response.data.grades;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
-            this.edit_errors = response.data.message;
+            this.edit_errors = [response.data.message];
           }
         })
         .catch((errors) => {
           console.log(errors);
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     deleteGrade(id, grade) {
@@ -406,14 +431,17 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.grades = response.data.grades;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           }
         })
         .catch((errors) => {
           console.log(errors);
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     isAuth() {

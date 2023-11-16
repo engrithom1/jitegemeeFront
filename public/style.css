@@ -3427,3 +3427,9 @@ table.projects tr td:first-child {
     height: 100%;
     min-height: 720px;
 }
+
+/* custom css*/
+
+.v-toast__text {
+    color: #fff !important;
+}

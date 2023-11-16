@@ -33,6 +33,19 @@
                     aria-describedby="emailHelp"
                   />
                 </div>
+                <div class="form-group">
+                  <label for="code">Subject Code*</label>
+                  <input
+                    id="code"
+                    type="text"
+                    class="form-control"
+                    v-model="this.form.code"
+                    minlength="4"
+                    maxlength="12"
+                    placeholder="code"
+                    aria-describedby="emailHelp"
+                  />
+                </div>
 
                 <button :disabled="this.form.role_id != 4" class="btn btn-success">Submit</button>
               </form>
@@ -52,9 +65,18 @@
                 <div class="col-md-12">
                   <div class="inbox-body">
                     <div class="mail-option">
-                      <table class="table table-inbox table-hover">
+                      <div v-if="this.loading" class="container mt-5 mb-5">
+                        <div class="row">
+                          <div class="span4">
+                            <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                          </div>
+                          <div class="span4"></div>
+                        </div>
+                      </div>
+                      <table v-if="!this.loading" class="table table-inbox table-hover">
                         <thead>
                           <th><b>subjects Name</b></th>
+                          <th><b>Code</b></th>
                           <th><b>Action</b></th>
                         </thead>
                         <tbody>
@@ -66,9 +88,12 @@
                             <td class="text-capitalize">
                               {{ subject.subject }}
                             </td>
+                            <td class="text-capitalize">
+                              {{ subject.code }}
+                            </td>
                             <td class="view-message">
                               <button :disabled="this.form.role_id != 4"
-                                @click="getEdit(subject.id, subject.subject)"
+                                @click="getEdit(subject.id, subject.subject,subject.code)"
                                 class="btn btn-sm btn-primary mr-1"
                                 data-toggle="modal"
                                 data-target="#edit-modal"
@@ -87,6 +112,18 @@
                           </tr>
                         </tbody>
                       </table>
+
+                      <div v-if="!this.loading">
+                        <div v-if="this.subjects.length == 0" class="container">
+                          <div class="row">
+                            <div class="span2"></div>
+                            <div class="span4">
+                              <h5 class="text-capitalize text-danger">Not Subject Found</h5>
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -106,7 +143,7 @@
   </div>
 
   <!-- The Modal -->
-  <div class="modal fade" id="edit-modal">
+  <div class="modal fade" data-backdrop="static" data-keyboard="false" id="edit-modal">
     <div class="modal-dialog">
       <div class="modal-content">
         <!-- Modal Header -->
@@ -129,6 +166,19 @@
                 class="form-control"
                 v-model="this.edit_subject"
                 placeholder="biology"
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <div class="form-group">
+              <label for="edit_code">Subject Code*</label>
+              <input
+                id="edit_code"
+                type="text"
+                class="form-control"
+                v-model="this.edit_code"
+                minlength="4"
+                maxlength="12"
+                placeholder="code"
                 aria-describedby="emailHelp"
               />
             </div>
@@ -156,14 +206,17 @@ export default {
       subjects: [],
       errors: [],
       edit_errors: [],
+      loading:true,
       form: {
         subject: "",
+        code:"",
         role_id: "",
         user_id: "",
       },
       subject_id: "",
       og_subject: "",
       edit_subject: "",
+      edit_code:"",
     };
   },
   methods: {
@@ -171,13 +224,15 @@ export default {
       axios.get(this.$store.state.api_url + "/subjects").then((response) => {
         //console.log(response.data);
         this.subjects = response.data;
+        this.loading = false;
       });
     },
-    getEdit(id, subject) {
+    getEdit(id, subject, code) {
       this.edit_errors = [];
       this.subject_id = id;
       this.og_subject = subject;
       this.edit_subject = subject;
+      this.edit_code = code;
     },
     addNewSubject() {
       this.errors = [];
@@ -186,20 +241,24 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.subjects = response.data.subjects;
-            alert(response.data.message);
+            
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
-            this.errors = response.data.message;
+            this.errors = [response.data.message];
           }
         })
         .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
+          //console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     updateSubject() {
       this.errors = [];
       var data = {
         subject: this.edit_subject,
+        code: this.edit_code,
         subject_id: this.subject_id,
         og_subject: this.og_subject,
         user_id: this.form.user_id,
@@ -210,14 +269,17 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.subjects = response.data.subjects;
-            alert(response.data.message);
+           
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,}) 
           } else {
-            this.errors = response.data.message;
+            this.errors = [response.data.message];
           }
         })
         .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
+          //console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     deleteSubject(id, subject) {
@@ -233,14 +295,18 @@ export default {
         .then((response) => {
           if (response.data.success) {
             this.subjects = response.data.subjects;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
-            alert(response.data.message);
+           
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
           }
         })
         .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
+          //console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     isAuth() {

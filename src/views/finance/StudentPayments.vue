@@ -3,41 +3,115 @@
       <div class="container-fluid">
           <div class="row column_title">
               <div class="col-md-12">
-                  <div class="page_title">
+                  <div class="page_title d-flex justify-content-between">
                       <h2>Finance > Student Payments</h2>
+                      <button v-on:click="this.refleshPage" class="btn btn-success ml-0">
+                        <i class="fa fa-arrow-left mr-2"></i>Back
+                        </button>
                   </div>
+                 
               </div>
           </div>
           <!--contents heaa-->
           <div v-if="!find_student" class="row column4 graph">
-              <div class="col-sm-6">
+              <div class="col-sm-12">
                   <div class="white_shd full margin_bottom_30">
                       <div class="full graph_head">
                           <div class="d-flex justify-content-between">
                               <div class="heading1 margin_0">
                                   <h2>Search Students</h2>
                               </div>
-                              <!--button v-on:click="this.parentExist" class="btn btn-success ml-0">Add Parent</button-->
+                              <!--button 401333 v-on:click="this.parentExist" class="btn btn-success ml-0">Add Parent</button-->
                           </div>
                       </div>
                       <div class="full progress_bar_inner">
                           <div class="row">
-                              <div class="col-md-12">
+                              <div class="col-md-12 ">
                                   <p class="pt-3 text-danger text-center">{{ this.index_no_erro }}</p>
                                   <div class="inbox-head">
-                                      <h3>Index Number</h3>
+                                      <h3>Regs Number</h3>
                                       <form @submit.prevent="searchStudentIndex"
                                           class="pull-right position search_inbox">
                                           <div class="input-append">
                                               <input type="text" minlength="4" maxlength="6"
                                                   v-model="this.search_index_no" class="sr-input"
-                                                  placeholder="0001" />
+                                                  placeholder="regs number 000001" />
                                               <button class="btn sr-btn" type="submit">
                                                   <i class="fa fa-search"></i>
                                               </button>
                                           </div>
                                       </form>
                                   </div>
+
+                                  <!--pending student-->
+                                  <div class="inbox-body">
+                                    <div class="mail-option">
+                                    <div class="table-responsive-md w-100">
+                                
+                                        <div v-if="this.loading" class="container mt-5 mb-5">
+                                        <div class="row">
+                                            <div class="span2"></div>
+                                            <div class="span4">
+                                            <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                                            </div>
+                                            <div class="span4"></div>
+                                        </div>
+                                        </div> 
+                                        
+                                        <table v-if="!this.loading" class="table table-hover">
+                                        <thead>
+                                            <th><b>Full Name</b></th>
+                                            <th><b>Regs No</b></th>
+                                            <th><b>Regs Year</b></th>
+                                            <th><b>Action</b></th>
+                                        </thead>
+                                        
+                                        <tbody>
+                                            <tr
+                                            v-show="students"
+                                            v-for="student in students"
+                                            :key="student.id"
+                                            class=""
+                                            >
+                                            <td class="">
+                                                {{
+                                                student.first_name +
+                                                " " +
+                                                student.middle_name +
+                                                " " +
+                                                student.last_name
+                                                }}
+                                            </td>
+                                            <td class="">{{ student.index_no }}</td>
+                                            <td >
+                                                {{ student.accademic_year }}
+                                            </td>
+                                            <td class="">
+                                                <button
+                                                v-on:click="this.Proceed(student)"
+                                                class="btn btn-sm btn-primary btn-table mr-1"
+                                                >
+                                                Proceed
+                                                </button>
+                                            </td>
+                                            </tr>
+                                        </tbody>
+                                        </table>
+                                        <div v-if="!this.loading">
+                                        <div v-if="this.students.length == 0" class="container">
+                                            <div class="row">
+                                            <div class="span2"></div>
+                                            <div class="span4">
+                                                <h5 class="text-capitalize text-danger">No Pending Student Found</h5>
+                                            </div>
+                                            <div class="span4"></div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                  </div>
+                                  <!--ends of pending student-->
                               </div>
                           </div>
                       </div>
@@ -279,13 +353,11 @@
                   <!--student details-->
                   <div class="white_shd full margin_bottom_30">
                       <div class="full graph_head">
-                          <div class="d-flex justify-content-between">
+                          <div class="">
                               <div class="heading1 margin_0">
-                                  <h2>Students Found</h2>
+                                  <h2>Student Found</h2>
                               </div>
-                              <button v-on:click="this.refleshPage" class="btn btn-success ml-0">
-                                  Back
-                              </button>
+                              
                           </div>
                       </div>
                       <div class="full progress_bar_inner m-3">
@@ -364,7 +436,8 @@ export default {
       deposit_slip_btn:false,
       remove_request_btn:false,
       find_btn: false,
-      ////above futa
+      loading:true,
+      ////above poaaa
       user_id:"",
       role_id:"",
       accademic_year: new Date().getFullYear(),
@@ -391,16 +464,31 @@ export default {
       pay_valid_to:"",
       ////remove fee request
       remove_fee:{},
-      remove_reason:""
+      remove_reason:"",
+      ///pending student
+      students:[]
     };
   },
   methods: {
+    pendingStudents() {
+      axios.get(this.$store.state.api_url + "/pending_students").then((response) => {
+        //console.log(response.data);
+        this.students = response.data.students;
+        this.loading = false;
+      });
+    },
+    Proceed(student){
+       this.student = student
+       this.selected_class = {}
+       this.admission_id = student.admission
+       this.find_student = true;
+    },
     levelClass() {
         console.log(this.clasz)
         let level = this.levels.find((i) => i.id === this.level_id);
         let clazs = this.claszs.filter((i) => i.level === level.level);
         this.clasz = clazs;
-        console.log(this.clasz)
+        //console.log(this.clasz)
     },
     getAdmissionType() {
       axios.get(this.$store.state.api_url + "/admissions").then((response) => {
@@ -415,7 +503,7 @@ export default {
       this.index_no_erro = ""
       var index_no = this.search_index_no
 
-      if(index_no > 0 && index_no < 100000){
+      if(index_no > 0 && index_no < 1000000){
         this.find_btn = true
 
         axios.post(this.$store.state.api_url + "/search_student_index_no",{'index_no':index_no}).then((response) => {
@@ -427,23 +515,28 @@ export default {
           if(student.level_id == 0){
             this.selected_class = {}
             this.admission_id = student.admission
-            this.find_student = !this.find_student;
+            this.find_student = true;
           }else{
             this.admission_id = student.admission
             let level = this.levels.find((i) => i.id === this.level_id);
-            let clazs = this.claszs.filter((i) => i.level === level.level);
+            let clazs = this.claszs.filter((i) => i.level_id === level.id);
 
             this.clasz = clazs;
             let clas = clazs.find((i) => i.id === student.classroom_id);
             this.selected_class = clas
 
-            this.find_student = !this.find_student;
+            this.find_student = true;
           }
           this.find_btn = false
         }else{
           this.index_no_erro = "Not student found, Enter correct index no"
           this.find_btn = false
         }
+        }).catch((errors) => {
+          //console.log(errors);
+          
+            var message = "Network or Server Errors";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
       
       }else{
@@ -463,19 +556,21 @@ export default {
         var year = this.accademic_year
 
         axios.post(this.$store.state.api_url + "/check_required_fees",{student_id,class_id,year,fees,level_id,user_id,role_id,admission_id}).then((response) => {
-        console.log(response.data);
+        //console.log(response.data);
         if (response.data.success) {
             this.feepays = response.data.feepay;
             this.o_fees = response.data.o_fees;
             this.student_balance = response.data.student_balance;
             this.prepare_payment = false;
         } else {
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
         }
 
         }).catch((errors) => {
-          console.log(errors);
-          alert("Something goes wrong try again");
+          //console.log(errors);
+            var message = "Something goes wrong try again";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
 
     },
@@ -508,16 +603,19 @@ export default {
           this.deposit_description = ""
           this.deposit_number = ""
 
-          alert("deposit successfully");
+            var message = "deposit successfully";
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
 
         } else {
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
             this.deposit_slip_btn = false;
         }
 
         }).catch((errors) => {
-          console.log(errors);
-          alert("Something goes wrong try again");
+            console.log(errors);
+            var message = "Something goes wrong try again";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
           this.deposit_slip_btn = false;
         });
       
@@ -545,18 +643,25 @@ export default {
 
       ////date mandingo
       if(s_amount > s_paid_amount + pay_amount && valid_to == year+'1210'){
-        alert('The date should be below 10/ 12/ '+year)
+       
+            var message = 'The date should be below 10/ 12/ '+year;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
       }else{
 
         if(s_amount == s_paid_amount + pay_amount && valid_to != year+'1210'){
-            alert('The date should be 10/ 12/ '+year)
+           
+            var message = 'The date should be 10/ 12/ '+year;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
         }else{
 
           if(pay_amount > s_amount - s_paid_amount){
-            alert("can't pay more than required")
+           
+            var message = "can't pay more than required";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
           }else{
              if(pay_amount > b_amount){
-                alert('balance is not enought')
+                var message = "balance is not enought";
+                this.$toast.error(message,{duration: 7000,dismissible: true,})
              }else{
                 
                 this.add_payment_btn = true;     
@@ -567,14 +672,21 @@ export default {
                       this.student_balance = response.data.student_balance;
                       this.add_payment_btn = false;
 
+                      var message = response.data.message;
+                      this.$toast.success(message,{duration: 7000,dismissible: true,})
+
                   } else {
-                      alert(response.data.message);
+                     
+                      var message = response.data.message;
+                      this.$toast.error(message,{duration: 7000,dismissible: true,})
                       this.add_payment_btn = false;
                   }
 
                   }).catch((errors) => {
-                    console.log(errors);
-                    alert("Something goes wrong try again");
+                    //console.log(errors);
+                  
+                    var message = "Something goes wrong try again";
+                    this.$toast.error(message,{duration: 7000,dismissible: true,})
                     this.add_payment_btn = false;
                   });
              }
@@ -601,13 +713,16 @@ export default {
             this.add_remove_fee = false;
 
         } else {
-            alert(response.data.message);
+            
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
             this.add_remove_fee = false;
         }
 
         }).catch((errors) => {
-          console.log(errors);
-          alert("Something goes wrong try again");
+          //console.log(errors);
+          var message = "Something goes wrong try again";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
           this.add_remove_fee = false;
         });
     },
@@ -634,17 +749,22 @@ export default {
 
         axios.post(this.$store.state.api_url + "/remove_fee_request",{fee_name,year,amount,paid_amount,student_id,fee_id,fee_payment_id,user_id,role_id,reason}).then((response) => {
         if (response.data.success) {
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
             this.remove_request_btn = false;
 
         } else {
-            alert(response.data.message);
+         
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
             this.remove_request_btn = false;
         }
 
         }).catch((errors) => {
-          console.log(errors);
-          alert("Something goes wrong try again");
+          //console.log(errors);
+         
+          var message = "Something goes wrong try again";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
           this.remove_request_btn = false;
         });
     },
@@ -673,6 +793,7 @@ export default {
   created() {
    
     this.getAdmissionType();
+    this.pendingStudents();
     this.allLevel();
     this.allClaszs();
     this.isAuth();

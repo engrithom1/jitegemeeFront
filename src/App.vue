@@ -113,14 +113,20 @@
                 <span>Accademic</span></a
               >
               <ul class="collapse list-unstyled" id="apps">
-                <li>
-                  <router-link to="/classroom"
-                    >> <span>Classroom</span></router-link
-                  >
-                </li>
+                
                 <li>
                   <router-link to="/subjects"
                     >> <span>Subjects</span></router-link
+                  >
+                </li>
+                <li>
+                  <router-link to="/courses"
+                    >> <span>Courses</span></router-link
+                  >
+                </li>
+                <li>
+                  <router-link to="/classroom"
+                    >> <span>Classroom</span></router-link
                   >
                 </li>
                 <li>

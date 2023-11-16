@@ -86,21 +86,27 @@
             <div class="white_shd full margin_bottom_30">
                 <div class="table_section padding_infor_info">
                     <div class="table-responsive-sm">
+                      <div v-if="results.length > 0" class="row">
+                        <div class="col-sm-6 col-md-10"></div>
+                        <div class="col-sm-6 col-md-2">
+                          <button :disabled="results.length == 0" type="submit" class="btn btn-dark form-control"><i class="fa fa-file-pdf-o"> </i> Export PDF</button>
+                        </div>
+                      </div>
                     <table class="table">
                       <thead>
                         <tr>
                           <th><b>Index No</b></th>
-                        <th><b>Full Name</b></th>
-                        <th><b>Avge</b></th>
-                        <th><b>Pnts</b></th>
-                        <th><b>Divs</b></th>
-                        <th><b>Potn</b></th>
-                        <th><b>Subject Detailed</b></th>
+                          <th><b>Full Name</b></th>
+                          <th><b>Avge</b></th>
+                          <th><b>Pnts</b></th>
+                          <th><b>Divs</b></th>
+                          <th><b>Potn</b></th>
+                          <th><b>Subject Detailed</b></th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr v-for="result in results" :key="result.index_no" class="">
-                          <td class="">S.1234.{{ result.index_no }}</td>
+                          <td class="">{{ result.index_no }}</td>
                           <td class="text-capitalize">{{ result.first_name+" "+result.middle_name+" "+result.last_name }}</td>
                           <td class="">{{ (result.total_marks / result.subjects).toFixed(1) }}</td>
                           <td class="">{{ result.points }}</td>

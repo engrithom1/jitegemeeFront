@@ -9,6 +9,7 @@ import Parents from "../views/admission/Parents.vue"
 
 //acaademic
 import Class from "../views/accademic/Class.vue"
+import Course from "../views/accademic/Course.vue"
 import Grades from "../views/accademic/Grades.vue"
 import Subjects from "../views/accademic/Subjects.vue"
 import Exams from "../views/accademic/Exams.vue"
@@ -79,6 +80,11 @@ const routes = [
     path: '/classroom',
     name: 'Class',
     component: Class
+  },
+  {
+    path: '/courses',
+    name: 'Course',
+    component: Course
   },
   {
     path: '/subjects',

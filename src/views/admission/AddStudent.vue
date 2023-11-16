@@ -10,8 +10,9 @@
       </div>
       <!--contents heaa-->
       <div class="row column4 graph">
-        <div class="col-md-7">
-          <div v-show="!parent_exist" class="white_shd full margin_bottom_30">
+        <!--search parent-->
+        <div class="col-md-12">
+          <div v-if="!parent_exist" class="white_shd full margin_bottom_30">
             <div class="full graph_head">
               <div class="d-flex justify-content-between">
                 <div class="heading1 margin_0"><h2>Search Parent</h2></div>
@@ -27,20 +28,21 @@
                       class="pull-right position search_inbox"
                     >
                       <p
-                        v-for="error in errors"
+                        v-for="error in search_errors"
                         :key="error"
                         class="text-danger"
                       >
-                        {{ error[0] }}
+                        {{ error }}
                       </p>
                       <div class="input-append">
                         <input
                           type="text"
                           class="sr-input"
                           v-model="this.search.search_parent"
-                          placeholder="Search parent"
+                          placeholder="Search phone / name"
+                          required
                         />
-                        <button class="btn sr-btn" type="submit">
+                        <button :disabled="this.loading" class="btn sr-btn" type="submit">
                           <i class="fa fa-search"></i>
                         </button>
                       </div>
@@ -48,32 +50,27 @@
                   </div>
                   <div class="inbox-body">
                     <div class="mail-option">
-                      <ul class="unstyled inbox-pagination mb-3">
-                        <li><span>1-50 of 234</span></li>
-                        <li>
-                          <a class="np-btn" href="#"
-                            ><i class="fa fa-angle-left pagination-left"></i
-                          ></a>
-                        </li>
-                        <li>
-                          <a class="np-btn" href="#"
-                            ><i class="fa fa-angle-right pagination-right"></i
-                          ></a>
-                        </li>
-                      </ul>
                       <div class="table-responsive-md w-100">
-                        <table class="table table-hover">
+
+                        <div v-if="this.loading" class="container mt-5 mb-5">
+                          <div class="row">
+                            <div class="span2"></div>
+                            <div class="span4">
+                              <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                        </div>
+
+                        <table v-if="!this.loading" class="table table-hover">
                           <thead>
                             <th><b>Full Name</b></th>
                             <th><b>Phone</b></th>
                             <th><b>Action</b></th>
                           </thead>
                           <tbody>
-                            <div v-show="parents.length == 0">
-                              <h4 class="text-center">no parents found</h4>
-                            </div>
                             <tr
-                              v-show="parents"
+                              v-if="parents"
                               v-for="parent in parents"
                               :key="parent.id"
                               class=""
@@ -110,6 +107,19 @@
                             </tr>
                           </tbody>
                         </table>
+
+                        <div v-if="!this.loading">
+                          <div v-if="this.parents.length == 0" class="container">
+                            <div class="row">
+                              <div class="span2"></div>
+                              <div class="span4">
+                                <h5 class="text-capitalize text-danger">Not Parent Found</h5>
+                              </div>
+                              <div class="span4"></div>
+                            </div>
+                          </div>
+                        </div>
+
                       </div>
                     </div>
                   </div>
@@ -118,7 +128,8 @@
             </div>
           </div>
         </div>
-        <div v-show="parent_exist" class="row">
+        <!--student parent detail panel-->
+        <div v-if="parent_exist" class="row">
           <div class="col-md-7">
             <div class="white_shd full margin_bottom_30">
               <div class="full graph_head">
@@ -141,17 +152,35 @@
                   </div>
                   <div class="col-md-12">
                     <form @submit.prevent="addStudent" class="p-3">
-                      <div class="form-group">
-                        <label for="sindex">Index Number*</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          v-model="this.form.index_no"
-                          minlength="4"
-                          maxlength="4"
-                          placeholder="0000"
-                          required
-                        />
+                      <div class="row">
+                        <div class="col-sm-6 col-md-6">
+                          <div class="form-group">
+                            <label for="sindex">PREM Number*</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              v-model="this.form.prem_no"
+                              minlength="4"
+                              maxlength="20"
+                              placeholder="0000"
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                          <div class="form-group">
+                            <label for="sindex">Admission Number*</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              v-model="this.form.index_no"
+                              minlength="4"
+                              maxlength="6"
+                              placeholder="0000"
+                              required
+                            />
+                          </div>
+                        </div>
                       </div>
                       <div class="form-group">
                         <label for="sfname">First Name*</label>
@@ -325,7 +354,7 @@
                               </option>
                             </select>
                           </div>
-                          <div v-show="transfer_in">
+                          <div v-if="transfer_in">
                             <div class="form-group">
                               <label for="sphone">School From*</label>
                               <input
@@ -530,12 +559,14 @@ export default {
       relations: [],
       adm_types:[],
       search_errors: [],
+      loading:true,
       search: {
         search_parent: "",
       },
       form: {
         email: "",
         index_no: "",
+        prem_no:"",
         first_name: "",
         last_name: "",
         middle_name: "",
@@ -544,6 +575,7 @@ export default {
         home_address: "",
         nationality: "",
         accademic_year: new Date().getFullYear(),
+        regist_year: new Date().getFullYear(),
         birth_date: "",
         behavior: "",
         hearth: "",
@@ -606,24 +638,28 @@ export default {
       }
     },
     searchParent() {
+      this.loading = true;
       axios
         .post(this.$store.state.api_url + "/search-parent", this.search)
         .then((response) => {
           if (response.data.success) {
             this.parents = response.data.parents;
-            console.log(response.data.parents);
+            //console.log(response.data.parents);
+            this.loading = false;
           } else {
             this.search_errors = response.data.message;
           }
         })
         .catch((errors) => {
-          alert("Network or Server Errors");
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
     },
     allParents() {
       axios.get(this.$store.state.api_url + "/parents").then((response) => {
         //console.log(response.data);
         this.parents = response.data;
+        this.loading = false;
       });
     },
     allParentStatus() {
@@ -663,12 +699,15 @@ export default {
       });
     },
     addStudent() {
+      
       var accademic_year = this.form.accademic_year;
       var birth_date = this.form.birth_date;
       var birth = birth_date.split("-")[0];
       var Yearz = accademic_year - birth;
+
       if (Yearz < 12) {
-        alert("Student is under Age 'only '" + Yearz + "!");
+        var message = "Student is under Age 'only '" + Yearz + " !"
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
       } else {
         this.errors = [];
         axios
@@ -683,14 +722,17 @@ export default {
               this.parents = response.data.parents;
               this.parent_exist = false;
               this.parent = {};
-              alert(response.data.message);
+            
+              var message = response.data.message;
+              this.$toast.success(message,{duration: 7000,dismissible: true,})
               window.location.reload();
             } else {
-              this.errors = response.data.message;
+              this.errors = [response.data.message];
             }
           })
           .catch((errors) => {
-            alert("Network or Server Errors");
+            var message = "Network or Server Errors";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
           });
       }
     },

@@ -131,7 +131,7 @@
       </div>
 
         <!-- The Modal maxxxxxxxx -->
-        <div class="modal fade hide" data-backdrop="static" data-keyboard="false" id="myModal">
+        <div class="modal fade" data-backdrop="static" data-keyboard="false" id="myModal">
             <div class="modal-dialog">
                <div class="modal-content">
                   <!-- Modal Header -->
