@@ -1,3 +1,10 @@
+<style>
+.img-student{
+    width: 80px;
+    height: 80px;
+}
+</style>
+
 <template>
     <div class="midde_cont">
         <div class="container-fluid">
@@ -13,7 +20,7 @@
             </div>
             <!--contents heaa-->
             <div v-if="!find_student" class="row column4 graph" >
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <div class="white_shd full margin_bottom_30">
                         <div class="full graph_head">
                             <div class="d-flex justify-content-between">
@@ -74,48 +81,68 @@
                             </div>
                             <div class="full">
                                  <div class="invoice_inner">
-                                    <div class="row  m-3">
-                                       <div class="col-md-4">
+                                    <div class="row  m-3" id="personal_info">
+                                        <div class="col-12 d-flex justify-content-between mb-3">
+                                            <img width="100" src="/assets/images/logo/jmis_logo-bg.png" alt="#" />
+                                            <p class="text-center mt-3"> <strong class="text-center"> JITEGEMEE  HIGH  SCHOOL </strong><br/>Student Parent and Admission Details</p>
+                                            <h6 class="text-center mt-3">Cretated at:<br/>{{this.to_date}}</h6>
+                                        </div>
+                                       <div class="col-12">
                                         
                                           <div class="full invoice_blog">
                                              <h4>Personal</h4>
-                                             <img class="img-responsive float-right" :src="'/assets/images/logo/'+student.photo" width='40%' alt="no image">
+                                             <img class="img-responsive float-right img-student" :src="'/assets/images/logo/'+student.photo" width='40%' alt="no image">
                                              <p><strong>{{student.first_name+" "+student.middle_name+" "+student.last_name}}</strong><br>  
                                                 {{ student.nationality }}, {{ student.gender }}<br> 
-                                                {{ student.home_address }}<br>
-                                                <strong>Birth date : </strong>{{student.birth_date}}<br>    
-                                                <strong>Health : </strong>{{student.health}}<br>  
+                                                <strong>Health : </strong>{{student.health}}<br>
+                                                <strong>home : </strong>{{ student.home_address }}<br>
+                                                <strong>Birth date : </strong>{{student.birth_date}}<br> 
+                                                <strong>Parental Status : </strong>{{student.parent_status}}<br>
+                                                <strong>Behavour and Health </strong><br>{{ student.behavior }}<br> 
                                                 <strong>Contacts : </strong>{{ student.phone+", "+student.email }}
                                              </p>
                                           </div>
                                        </div>
-                                       <div class="col-md-4">
+                                       <div class="col-12">
                                         
                                           <div class="full invoice_blog">
                                              <h4>Admission</h4>
                                             <div v-if="this.admission_loading" class="container mt-5 mb-5">
                                                 <img class="center-block" width="250" src="/assets/images/loading/cupertino.gif" alt="#" />
                                             </div>
-                                             <p v-if="!admission_loading"><strong>David Roman</strong><br>  
-                                                427 Schoen Circles Suite 124<br> 
-                                                Melbourne Australia<br>    
-                                                <strong>Phone : </strong><a href="tel:9876543210">9876 543 210</a><br>  
-                                                <strong>Email : </strong><a href="mailto:yourmail@gmail.com">Yourmail@gmail.com</a>
+                                             <p v-if="!admission_loading"><strong>Registered: </strong>{{ admission.created_at }}<br>
+                                                <strong>Registration No : </strong>{{ admission.index_no }}<br>
+                                                <strong>PREM No : </strong>{{ admission.prem_no }}<br>
+                                                <strong>Status : </strong>{{ student.status_name }}<br>
+                                                <strong>Accademic Year: </strong>{{ admission.accademic_year }}<br>  
+                                                <strong>Class: </strong>{{ admission.level+", "+admission.classname }}<br>
+                                                <strong>Admission Type : </strong>{{admission.admission}}<br/>   
+                                                <strong>Entry Type : </strong>{{ admission.entry }} <span v-if="admission.entry_id == 2"> <strong>From</strong> {{admission.school_from}}<strong> Reason </strong> {{admission.transfer_reason }}</span><br>  
+                                                
                                              </p>
                                           </div>
                                        </div>
-                                       <div class="col-md-4">
+                                       <div class="col-12">
                                           <div class="full invoice_blog">
-                                             <h4>Parents </h4>
+                                             <h4>Parent </h4>
                                             <div v-if="this.parent_loading" class="container mt-5 mb-5">
                                                 <img class="center-block" width="250" src="/assets/images/loading/cupertino.gif" alt="#" />
                                             </div>
-                                             <p v-if="!parent_loading"><strong>Order ID : </strong>5b6R9C<br> 
-                                                <strong>Payment Due : </strong>July/18/2018<br> 
-                                                <strong>Account : </strong>254-55847
+                                            <img v-if="!parent_loading" class="img-responsive float-right img-student" :src="'/assets/images/logo/'+parent.photo" alt="no image">
+                                             <p v-if="!parent_loading"><strong>{{parent.first_name+" "+parent.middle_name+" "+parent.last_name}}</strong><br>
+                                                {{ parent.nationality }}, {{ parent.gender }}<br> 
+                                                <strong>Home : </strong>{{ parent.home_address }}<br>
+                                                <strong>Relation : </strong>{{ parent.relation }}<br>
+                                                <strong>Occupation : </strong>{{parent.occupation}}<br>  
+                                                <strong>Contacts : </strong>{{ parent.phone+", "+parent.email }}
                                              </p>
                                           </div>
                                        </div>
+                                       <div class="col-12">
+                                       </div>
+                                    </div>
+                                    <div class="float-right">
+                                            <button v-on:click="exportPersonalInfo" class="btn btn-dark form-control"><i class="fa fa-file-pdf-o"> </i> Export PDF</button>
                                     </div>
                                  </div>
                             </div>
@@ -308,7 +335,9 @@
   </template>
   
   <script>
-  import axios from "axios";
+  import axios from "axios"
+  import jspdf from "jspdf"
+
   export default {
     data() {
       return {
@@ -317,13 +346,17 @@
         search_loading:false,
         parent_loading:true,
         admission_loading:true,
+        print_personal_info:false,
         ////basic
         user_id:"",
         role_id:"",
         accademic_year: new Date().getFullYear(),
         student:{},
+        admission:{},
+        parent:{},
         search_index_no:"",
         index_no_erro:"",
+        to_date:"",
       };
     },
     methods: {
@@ -344,6 +377,18 @@
         if(response.data.success && response.data.student != null){
           this.student = response.data.student
           this.find_student = true
+          ///call function for more details
+          this.admissionInfo()
+          this.parentInfo()
+
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = dd + ' /' + mm + ' /' + yyyy;
+
+        this.to_date = today;
           
         }else{
           this.index_no_erro = "Not student found, Enter correct index no"
@@ -360,6 +405,46 @@
         this.index_no_erro = "Enter correct index no "+this.search_index_no
         this.find_btn = false
       }
+    },
+    exportPersonalInfo(){
+        var reg_no = this.student.index_no
+
+        const doc = new jspdf()
+        const html = document.getElementById('personal_info').innerHTML
+
+        doc.html(html, {
+            callback: function(doc) {
+                // Save the PDF
+                doc.save(reg_no+"_persoanl_info.pdf");
+            },
+            x: 15,
+            y: 15,
+            width: 170, //target width in the PDF document
+            windowWidth: 650 //window width in CSS pixels
+        });
+
+    },
+    admissionInfo(){
+        var student_id = this.student.id
+        axios.post(this.$store.state.api_url + "/admission-info",{student_id}).then((response) => {
+        //console.log(response.data);
+        if(response.data != null){
+            this.admission = response.data;
+            this.admission_loading = false;
+        }
+        })
+
+    },
+    parentInfo(){
+        var student_id = this.student.id
+        axios.post(this.$store.state.api_url + "/parent-info",{student_id}).then((response) => {
+        //console.log(response.data);
+        if(response.data != null){
+            this.parent = response.data;
+            this.parent_loading = false;
+        }
+        })
+
     },
     isAuth() {
     var user = localStorage.getItem("user");

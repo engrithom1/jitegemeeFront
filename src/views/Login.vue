@@ -6,7 +6,7 @@
           <div class="login_section">
             <div class="logo_login">
               <div class="center">
-                <img width="90" src="/assets/images/logo/jmis_logo.png" alt="#" />
+                <img width="200" src="/assets/images/logo/jmis_logo-bg.png" alt="#" />
               </div>
             </div>
             <div class="login_form">
