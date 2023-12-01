@@ -34,6 +34,18 @@
                   />
                 </div>
                 <div class="form-group">
+                  <label>Select Level*</label>
+                  <select v-on:change="levelSelected()" class="form-control" required v-model="this.form.level_id">
+                    <option
+                      v-for="level in levels"
+                      :key="level.id"
+                      :value="level.id"
+                    >
+                      {{ level.level }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group">
                   <label for="famount">Amount TZS*</label>
                   <input
                     type="number"
@@ -43,6 +55,18 @@
                     placeholder="230000"
                     aria-describedby="emailHelp"
                   />
+                </div>
+                <div class="form-group">
+                  <label>Select Status*</label>
+                  <select v-on:change="levelSelected()" class="form-control" required v-model="this.form.fstatus">
+                    <option
+                      v-for="fstatus in fstatuses"
+                      :key="fstatus.id"
+                      :value="fstatus.id"
+                    >
+                      {{ fstatus.status }}
+                    </option>
+                  </select>
                 </div>
                 <!--div class="form-group">
                   <label for="famount">Payment Duration*</label>
@@ -74,7 +98,7 @@
             </div>
           </div>
         </div>
-        <div class="col-sm-12 col-md-7">
+        <div class="col-sm-12 col-md-12">
           <div class="white_shd full margin_bottom_30">
             <div class="full graph_head">
               <div class="d-flex justify-content-between">
@@ -89,18 +113,19 @@
                     <div class="mail-option">
                       <div v-if="this.loading" class="container mt-5 mb-5">
                           <div class="row">
+                            <div class="span2"></div>
                             <div class="span4">
                               <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
                             </div>
                             <div class="span4"></div>
                           </div>
                       </div>
-                      <table v-if="!this.loading" class="table table-inbox table-hover">
+                      <table v-if="!this.loading" class="table table-responsive-sm table-hover">
                         <thead>
                           <th><b>Fee Name</b></th>
                           <th><b>Amount</b></th>
-                          <!--th><b>Min Amount</b></th>
-                          <th><b>Duration</b></th-->
+                          <th><b>Level</b></th>
+                          <th><b>Status</b></th>
                           <th style="width:100px"><b>Action</b></th>
                         </thead>
                         <tbody>
@@ -111,12 +136,20 @@
                             <td class="">
                               {{ fee.amount }}
                             </td>
-                            <!--td class="">
-                              {{ fee.min_amount }}
-                            </td>
                             <td class="">
-                              {{ fee.duration }}
-                            </td-->
+                              {{ fee.level }}
+                            </td>
+                            
+                            <td v-if="fee.status == 3" class="text-danger">
+                               <span></span>{{ fee.status_label }}
+                            </td>
+                            <td v-if="fee.status == 2" class="text-info">
+                              {{ fee.status_label }}
+                            </td>
+                            <td v-if="fee.status == 1" class="">
+                              {{ fee.status_label }}
+                            </td>
+                           
                             <td class="view-message" >
                               <button :disabled="this.form.role_id != 4"
                                 @click="
@@ -125,7 +158,8 @@
                                     fee.fee,
                                     fee.amount,
                                     fee.min_amount,
-                                    fee.duration
+                                    fee.duration,
+                                    fee.status
                                   )
                                 "
                                 class="btn btn-sm btn-primary mr-1"
@@ -210,6 +244,18 @@
                 aria-describedby="emailHelp"
               />
             </div>
+            <div class="form-group">
+              <label>Select Status*</label>
+              <select class="form-control" required v-model="this.edit_fstatus">
+                <option
+                  v-for="fstatus in fstatuses"
+                  :key="fstatus.id"
+                  :value="fstatus.id"
+                >
+                  {{ fstatus.status }}
+                </option>
+              </select>
+            </div>
             <!--div class="form-group">
               <label for="famount">Payment Duration*</label>
               <select
@@ -260,6 +306,8 @@ export default {
   data() {
     return {
       fees: [],
+      levels: [],
+      fstatuses:[],
       errors: [],
       edit_errors: [],
       loading:true,
@@ -271,17 +319,28 @@ export default {
         min_amount: "",
         duration: "",
         role_id: "",
+        level_id: "",
         user_id: "",
+        fstatus:""
       },
       fee_id: "",
       og_fee: "",
       edit_fee: "",
+      edit_fstatus: "",
       edit_amount: "",
       edit_min_amount: "",
       edit_duration: "",
     };
   },
   methods: {
+
+    allLevel() {
+      axios.get(this.$store.state.api_url + "/all-levels").then((response) => {
+        //console.log(response.data);
+        var levels = response.data
+        this.levels = levels;
+      });
+    },
     payDuration() {
       if (this.form.duration >= 2) {
         this.min_amount_bool = true;
@@ -299,13 +358,20 @@ export default {
       }
     },
     allFees() {
-      axios.get(this.$store.state.api_url + "/fees").then((response) => {
+      axios.get(this.$store.state.api_url + "/level-fees").then((response) => {
         //console.log(response.data);
         this.fees = response.data;
         this.loading = false;
       });
     },
-    getEdit(id, fee, amount, min_amount, duration) {
+    feeStatus() {
+      axios.get(this.$store.state.api_url + "/fee-status").then((response) => {
+        //console.log(response.data);
+        this.fstatuses = response.data;
+        
+      });
+    },
+    getEdit(id, fee, amount, min_amount, duration,status) {
       this.edit_errors = [];
       this.fee_id = id;
       this.og_fee = fee;
@@ -313,6 +379,7 @@ export default {
       this.edit_amount = amount;
       this.edit_min_amount = min_amount;
       this.edit_duration = duration;
+      this.edit_fstatus = status;
 
       if (this.edit_duration >= 2) {
         this.min_amount_edit_bool = true;
@@ -344,6 +411,7 @@ export default {
       var data = {
         fee: this.edit_fee,
         amount: this.edit_amount,
+        status: this.edit_fstatus,
         min_amount: this.edit_min_amount,
         duration: this.edit_duration,
         fee_id: this.fee_id,
@@ -406,6 +474,8 @@ export default {
   },
   created() {
     this.allFees();
+    this.allLevel();
+    this.feeStatus();
     this.isAuth();
     /*axios.defaults.headers.common["Authorization"] =
       "Bearer " + localStorage.getItem("user_token");*/

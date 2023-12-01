@@ -16,7 +16,7 @@
                 </p>
                 <fieldset>
                   <div class="field">
-                    <label class="label_field">Username</label>
+                    <!--label class="label_field hidden">Username</label-->
                     <input
                       type="text"
                       name="usarname"
@@ -25,7 +25,7 @@
                     />
                   </div>
                   <div class="field">
-                    <label class="label_field">Password</label>
+                    <label class="label_field hidden">Password</label>
                     <input
                       type="password"
                       name="password"
@@ -35,7 +35,7 @@
                   </div>
                   <div class="field">
                     <label class="label_field hidden">hidden label</label>
-                    <label class="form-check-label"
+                    <label class="form-check-label hidden"
                       ><input type="checkbox" class="form-check-input" />
                       Remember Me</label
                     >

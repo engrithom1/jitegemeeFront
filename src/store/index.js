@@ -25,10 +25,14 @@ export default createStore({
   },
 
   actions: {
-    loginUser({state,commit},user){
+    async loginUser({state,commit},user){
       commit('setZeroErrors');
       
-      axios.post(state.api_url+'/login',user).then(response =>{
+      var response = await axios.post(state.api_url+'/login',user)
+      .catch(errors =>{
+        console.log(errors)
+        commit('setErrors',"Network or Server Errors");
+     })
 
         if(response.data.success) {
 
@@ -41,10 +45,6 @@ export default createStore({
           commit('setErrors',response.data.message);
         }
          
-      }).catch(errors =>{
-         console.log(errors)
-         commit('setErrors',"Network or Server Errors");
-      })
   },
   logOut({state,commit},id){
 

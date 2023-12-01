@@ -94,7 +94,7 @@
                   </select>
                 </div>
 
-                <hr/>
+                <!--hr/>
                 <div class="form-grioup">
                   <label for="csubjects" class="mb-3">Select Fees*</label>
                   <div class="row">
@@ -103,7 +103,7 @@
                   <label :for="feez.fee">{{ feez.fee }}</label>
                   </div>
                   </div>
-                </div>
+                </div-->
                
                 <button :disabled="this.form.role_id != 4" class="btn btn-success">Submit</button>
               </form>
@@ -295,7 +295,7 @@
                   </div>
                 </div>
 
-                <hr/>
+                <!--hr/>
                 <div class="form-grioup">
                   <label for="csubjects" class="mb-3">Select Fees*</label>
                   <div class="row">
@@ -304,7 +304,7 @@
                   <label :for="'edit_'+feez.fee">{{ feez.fee }}</label>
                   </div>
                   </div>
-                </div>
+                </div-->
             <!-- Modal footer -->
             <div class="modal-footer">
               <button class="btn btn-success">Submit</button>
@@ -345,7 +345,7 @@ export default {
         course_id:0,
         classname: "",
         s_subjects:[],
-        s_fees:[],
+        s_fees:[0],
         roomnumber: "",
         level_id: "",
         teacher_id: "",
@@ -357,7 +357,7 @@ export default {
       edit_classname: "",
       edit_course_id: 0,
       edit_teacher_id: "",
-      edit_fees: [],
+      edit_fees: [0],
       edit_subjects: [],
       edit_roomnumber: "",
     };
@@ -373,39 +373,34 @@ export default {
         this.sub_show = true
       }
     },
-    allClaszs() {
-      axios.get(this.$store.state.api_url + "/class-teachers").then((response) => {
+    async allClaszs() {
+      var response = await axios.get(this.$store.state.api_url + "/class-teachers")
         //console.log(response.data);
         this.claszs = response.data;
-      });
     },
-    allCourses() {
-        axios.get(this.$store.state.api_url + "/courses").then((response) => {
+    async allCourses() {
+          var response = await axios.get(this.$store.state.api_url + "/courses")
           this.courses = response.data.filter((i) => i.id > 1);
           this.loading = false
           //console.log(response.data.filter((i) => i.id > 1));
-        });
       },
-    allSubjects() {
-      axios.get(this.$store.state.api_url + "/subjects").then((response) => {
+    async allSubjects() {
+      var response = await axios.get(this.$store.state.api_url + "/subjects")
         //console.log(response.data);
-        this.subjects = response.data;
-      });
+        this.subjects = response.data.filter((i) => i.level_id === 7);
     },
-    allFees() {
-      axios.get(this.$store.state.api_url + "/fees").then((response) => {
+    async allFees() {
+      var response = await axios.get(this.$store.state.api_url + "/fees")
         //console.log(response.data);
         this.fees = response.data;
-      });
     },
-    allStaff() {
-      axios.get(this.$store.state.api_url + "/staffs").then((response) => {
+    async allStaff() {
+      var response = await axios.get(this.$store.state.api_url + "/staffs")
         console.log(response.data);
         this.staffs = response.data;
-      });
     },
-    allLevel() {
-      axios.get(this.$store.state.api_url + "/levels").then((response) => {
+    async allLevel() {
+      var response = await axios.get(this.$store.state.api_url + "/levels")
         //console.log(response.data);
         var levels = response.data
 
@@ -418,7 +413,6 @@ export default {
         this.levels = levels;
         this.o_levels = o_levels;
         }
-      });
     },
     getEdit(id, classname, roomnumber,fees, subjects,teacher_id, course_id) {
       this.edit_errors = [];
@@ -439,7 +433,7 @@ export default {
         this.edit_sub_show = false;
       }
     },
-    addNewClass() {
+    async addNewClass() {
       this.errors = [];
       var feez = this.form.s_fees;
       var subjectz = this.form.s_subjects;
@@ -453,7 +447,9 @@ export default {
         course_id = 0
       }
 
-      if ((feez === undefined || feez.length == 0) || (subjectz === undefined || subjectz.length == 0)) {
+      //feez === undefined || feez.length == 0) || (subjectz === undefined || subjectz.length == 0
+
+      if ((subjectz === undefined || subjectz.length == 0)) {
             var message = 'subjects or fees not selected, select it acordingly';
             this.$toast.success(message,{duration: 7000,dismissible: true,})
       }else{
@@ -469,9 +465,13 @@ export default {
         course_id:course_id
       };
       console.log(data)
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/create-class", data)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
+
           if (response.data.success) {
             this.claszs = response.data.claszs;
             var message = response.data.message;
@@ -491,14 +491,9 @@ export default {
             //this.errors = this.errors.push(response.data.message);
             //console.log(this.errors)
           }
-        })
-        .catch((errors) => {
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
       }
     },
-    updateClass() {
+    async updateClass() {
       this.errors = [];
       this.edit_errors = [];
       var feez = this.edit_fees.toString();
@@ -521,9 +516,13 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/update-class", data)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
+
           if (response.data.success) {
             this.claszs = response.data.claszs;
             var message = response.data.message;
@@ -536,13 +535,9 @@ export default {
             //console.log(this.errors)
             this.edit_errors = [response.data.message];
           }
-        })
-        .catch((errors) => {
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+
     },
-    deleteClass(id, classname) {
+    async deleteClass(id, classname) {
       this.errors = [];
       var data = {
         class_id: id,
@@ -550,9 +545,12 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/delete-class", data)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.claszs = response.data.claszs;
             var message = response.data.message;
@@ -561,11 +559,7 @@ export default {
             var message = response.data.message;
             this.$toast.error(message,{duration: 7000,dismissible: true,})
           }
-        })
-        .catch((errors) => {
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+ 
     },
     isAuth() {
       var user = localStorage.getItem("user");
@@ -578,13 +572,14 @@ export default {
     },
   },
   created() {
+    this.isAuth();
     this.allClaszs();
     this.allCourses();
     this.allLevel();
     this.allStaff();
     this.allFees();
     this.allSubjects();
-    this.isAuth();
+   
     /*axios.defaults.headers.common["Authorization"] =
       "Bearer " + localStorage.getItem("user_token");*/
   },

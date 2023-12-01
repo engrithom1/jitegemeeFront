@@ -138,13 +138,13 @@
                                   <form @submit.prevent="checkRequiredFees" class="p-3">
                                       <div class="form-group">
                                           <label for="pgender">Accademic Year*</label>
-                                          <input type="number" maxlength="4" minlength="4" class="form-control"
+                                          <input :disabled="this.role_id != 4 || this.department_id != 1" type="number" maxlength="4" minlength="4" class="form-control"
                                               v-model="this.accademic_year" aria-describedby="emailHelp" required />
                                       </div>
 
                                       <div class="form-group">
                                           <label>Select Level*</label>
-                                          <select required v-on:change="levelClass()" class="form-control"
+                                          <select :disabled="this.role_id != 4 || this.department_id != 1" required v-on:change="levelClass()" class="form-control"
                                               v-model="this.level_id">
                                               <option v-for="level in levels" :key="level.id" :value="level.id">
                                                   {{ level.level }}
@@ -154,7 +154,7 @@
 
                                       <div v-show="clasz" class="form-group">
                                           <label>Select Class*</label>
-                                          <select class="form-control" v-model="this.selected_class">
+                                          <select :disabled="this.role_id != 4 || this.department_id != 1" class="form-control" v-model="this.selected_class">
                                               <option v-for="clas in clasz" :key="clas.id" :value="clas">
                                                   {{ clas.classname }}
                                               </option>
@@ -367,7 +367,7 @@
                                       alt="" />
                               </div>
                               <div class="ml-3">
-                                  <p class="text-capitalize">Index Number: S.1234.{{ student.index_no }}</p>
+                                  <p class="text-capitalize">Index Number:{{ student.index_no }}</p>
                                   <p class="text-capitalize">Name: {{ student.first_name+" "+student.middle_name+" "+student.last_name }}</p>
                                   <p class="text-capitalize">Admmited Year: {{ student.accademic_year }}</p>
                                   <p class="text-capitalize">Status: {{ student.status_name }}</p>
@@ -436,15 +436,17 @@ export default {
       deposit_slip_btn:false,
       remove_request_btn:false,
       find_btn: false,
-      loading:true,
+      loading:false,
       ////above poaaa
       user_id:"",
       role_id:"",
+      department_id:"",
       accademic_year: new Date().getFullYear(),
       student:{},
       levels: [],
       claszs: [],
       clasz: [],
+      fees:[],
       adm_types:[],
       selected_class:{},
       level_id:"",
@@ -470,12 +472,13 @@ export default {
     };
   },
   methods: {
-    pendingStudents() {
-      axios.get(this.$store.state.api_url + "/pending_students").then((response) => {
+    async pendingStudents() {
+    var response = await axios.get(this.$store.state.api_url + "/pending_students")
         //console.log(response.data);
         this.students = response.data.students;
         this.loading = false;
-      });
+       
+     
     },
     Proceed(student){
        this.student = student
@@ -490,26 +493,31 @@ export default {
         this.clasz = clazs;
         //console.log(this.clasz)
     },
-    getAdmissionType() {
-      axios.get(this.$store.state.api_url + "/admissions").then((response) => {
+    async getAdmissionType() {
+    var response = await  axios.get(this.$store.state.api_url + "/admissions")
         //console.log(response.data);
         this.adm_types = response.data;
-      });
+     
     },
     refleshPage(){
       window.location.reload();
     },
-    searchStudentIndex() {
+    async searchStudentIndex() {
       this.index_no_erro = ""
       var index_no = this.search_index_no
 
       if(index_no > 0 && index_no < 1000000){
         this.find_btn = true
 
-        axios.post(this.$store.state.api_url + "/search_student_index_no",{'index_no':index_no}).then((response) => {
+        var response = await axios.post(this.$store.state.api_url + "/search_student_index_no",{'index_no':index_no}).catch((errors) => {
+          //console.log(errors);
+          
+            var message = "Network or Server Errors";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
         var student = response.data.student;
-
-        if(student){
+        //Object.keys(myObject).length == 0
+        if(Object.keys(student).length != 0){
           this.student = student
           this.level_id = student.level_id
           if(student.level_id == 0){
@@ -518,12 +526,13 @@ export default {
             this.find_student = true;
           }else{
             this.admission_id = student.admission
-            let level = this.levels.find((i) => i.id === this.level_id);
-            let clazs = this.claszs.filter((i) => i.level_id === level.id);
+            this.level_id = student.level_id
+            //let level = this.levels.find((i) => i.id === this.level_id);
+            //let clazs = this.claszs.filter((i) => i.level_id === level.id);
 
-            this.clasz = clazs;
-            let clas = clazs.find((i) => i.id === student.classroom_id);
-            this.selected_class = clas
+            //this.clasz = clazs;
+            //let clas = clazs.find((i) => i.id === student.classroom_id);
+            this.selected_class = {'id':student.classroom_id}
 
             this.find_student = true;
           }
@@ -532,22 +541,17 @@ export default {
           this.index_no_erro = "Not student found, Enter correct index no"
           this.find_btn = false
         }
-        }).catch((errors) => {
-          //console.log(errors);
-          
-            var message = "Network or Server Errors";
-            this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
       
       }else{
         this.index_no_erro = "Enter correct index no "+this.search_index_no
         this.find_btn = false
       }
     },
-    checkRequiredFees(){
+    async checkRequiredFees(){
 
         var class_id = this.selected_class.id;
-        var fees = this.selected_class.fees;
+        //var fees = this.selected_class.fees;
+        //var class_id = this.class.id
         var student_id = this.student.id;
         var user_id = this.user_id;
         var role_id = this.role_id;
@@ -555,7 +559,33 @@ export default {
         var admission_id = this.admission_id;
         var year = this.accademic_year
 
-        axios.post(this.$store.state.api_url + "/check_required_fees",{student_id,class_id,year,fees,level_id,user_id,role_id,admission_id}).then((response) => {
+        var fees = this.fees
+      var feef = []
+
+      if(level_id < 5){
+        fees.forEach(el => {
+        if(el.level_id == level_id && el.status == 1 || el.level_id == 0 && el.status == 1 || el.level_id == 7 && el.status == 1){
+          feef.push(el.id)
+        }
+      });
+      }
+      if(level_id > 4){
+        fees.forEach(el => {
+        if(el.level_id == level_id && el.status == 1 || el.level_id == 0 && el.status == 1 || el.level_id == 8 && el.status == 1){
+          feef.push(el.id)
+        }
+      });
+      }
+
+      var fees = feef.toString()
+
+      if(this.role_id == 4 || this.department_id == 3){
+         
+        var response = await axios.post(this.$store.state.api_url + "/check_required_fees",{student_id,class_id,year,fees,level_id,user_id,role_id,admission_id}).catch((errors) => {
+          //console.log(errors);
+            var message = "Something goes wrong try again";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
         //console.log(response.data);
         if (response.data.success) {
             this.feepays = response.data.feepay;
@@ -567,17 +597,16 @@ export default {
             this.$toast.error(message,{duration: 7000,dismissible: true,})
         }
 
-        }).catch((errors) => {
-          //console.log(errors);
-            var message = "Something goes wrong try again";
-            this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+      }else{
+        var message = "Your not belong to Finance Deptartiment";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
 
+      }
     },
     setPayAmount(){
       this.pay_amount = this.pay_selected_fee.amount - this.pay_selected_fee.paid_amount
     },
-    addDepositSlip(){
+    async addDepositSlip(){
         ///general data
       var class_id = this.selected_class.id;
       var level_id = this.level_id;
@@ -593,8 +622,15 @@ export default {
       var balance = this.student_balance.amount
 
       this.deposit_slip_btn = true;     
-              
-      axios.post(this.$store.state.api_url + "/add_deposit_slip",{balance,student_id,user_id,role_id,amount,class_id,level_id,year,description,deposit_code}).then((response) => {
+      if(this.role_id == 4 || this.department_id == 3){
+         
+        var response = await axios.post(this.$store.state.api_url + "/add_deposit_slip",{balance,student_id,user_id,role_id,amount,class_id,level_id,year,description,deposit_code}).catch((errors) => {
+            console.log(errors);
+            var message = "Something goes wrong try again";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
+          this.deposit_slip_btn = false;
+        });
+
         if (response.data.success) {
             this.student_balance = response.data.student_balance;
             this.deposit_slip_btn = false;
@@ -611,16 +647,13 @@ export default {
             this.$toast.error(message,{duration: 7000,dismissible: true,})
             this.deposit_slip_btn = false;
         }
-
-        }).catch((errors) => {
-            console.log(errors);
-            var message = "Something goes wrong try again";
-            this.$toast.error(message,{duration: 7000,dismissible: true,})
+      }else{       
+          var message = "Your not belong to Finance Deptartiment";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
           this.deposit_slip_btn = false;
-        });
-      
+    }
     },
-    addPaymentToStudent(){
+    async addPaymentToStudent(){
 
       ///general data
       var class_id = this.selected_class.id;
@@ -665,8 +698,14 @@ export default {
              }else{
                 
                 this.add_payment_btn = true;     
-              
-                axios.post(this.$store.state.api_url + "/add_payment_to_student",{f_id,pay_amount,valid_to,student_id,user_id,role_id,b_amount,b_id,s_id,s_paid_amount,class_id,level_id,year}).then((response) => {
+                if(this.role_id == 4 || this.department_id == 3){
+                    
+                    var response = await axios.post(this.$store.state.api_url + "/add_payment_to_student",{f_id,pay_amount,valid_to,student_id,user_id,role_id,b_amount,b_id,s_id,s_paid_amount,class_id,level_id,year}).catch((errors) => {
+                    //console.log(errors);
+                    var message = "Something goes wrong try again";
+                    this.$toast.error(message,{duration: 7000,dismissible: true,})
+                    this.add_payment_btn = false;
+                  });
                   if (response.data.success) {
                       this.feepays = response.data.feepay;
                       this.student_balance = response.data.student_balance;
@@ -682,19 +721,17 @@ export default {
                       this.add_payment_btn = false;
                   }
 
-                  }).catch((errors) => {
-                    //console.log(errors);
-                  
-                    var message = "Something goes wrong try again";
-                    this.$toast.error(message,{duration: 7000,dismissible: true,})
+                }else{
                     this.add_payment_btn = false;
-                  });
+                    var message = "Your not belong to Finance Deptartiment";
+                    this.$toast.error(message,{duration: 7000,dismissible: true,})
+             }  
              }
           }
         }
         }  
     },
-    addFeeToStudent(fee_id, fee_amount){
+    async addFeeToStudent(fee_id, fee_amount){
       
         var class_id = this.selected_class.id;
         var student_id = this.student.id;
@@ -705,7 +742,16 @@ export default {
 
         this.add_remove_fee = true;
 
-        axios.post(this.$store.state.api_url + "/add_fee_to_student",{student_id,class_id,year,fee_id,level_id,user_id,role_id,fee_amount}).then((response) => {
+        if(this.role_id == 4 || this.department_id == 3){
+         
+        var response = await axios.post(this.$store.state.api_url + "/add_fee_to_student",{student_id,class_id,year,fee_id,level_id,user_id,role_id,fee_amount})
+        .catch((errors) => {
+          //console.log(errors);
+          var message = "Something goes wrong try again";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+          this.add_remove_fee = false;
+        });
+
         if (response.data.success) {
             this.feepays = response.data.feepay;
             var o_fees = this.o_fees.filter((i) => i.id !== fee_id);
@@ -719,17 +765,16 @@ export default {
             this.add_remove_fee = false;
         }
 
-        }).catch((errors) => {
-          //console.log(errors);
-          var message = "Something goes wrong try again";
+        
+      }else{
+          var message = "Your not belong to Finance Deptartiment";
           this.$toast.error(message,{duration: 7000,dismissible: true,})
-          this.add_remove_fee = false;
-        });
+    }
     },
     removeFeeSelect(feepay){
        this.remove_fee = feepay;
     },
-    removeFeeRequest(){
+    async removeFeeRequest(){
         var r_fee = this.remove_fee
         var reason = this.remove_reason
 
@@ -746,8 +791,15 @@ export default {
         var year = this.accademic_year
 
         this.remove_request_btn = true;
+        if(this.role_id == 4 || this.department_id == 3){
+          
+        var response = await axios.post(this.$store.state.api_url + "/remove_fee_request",{fee_name,year,amount,paid_amount,student_id,fee_id,fee_payment_id,user_id,role_id,reason}).catch((errors) => {
+          //console.log(errors);
+          var message = "Something goes wrong try again";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+          this.remove_request_btn = false;
+        });
 
-        axios.post(this.$store.state.api_url + "/remove_fee_request",{fee_name,year,amount,paid_amount,student_id,fee_id,fee_payment_id,user_id,role_id,reason}).then((response) => {
         if (response.data.success) {
             var message = response.data.message;
             this.$toast.success(message,{duration: 7000,dismissible: true,})
@@ -760,25 +812,29 @@ export default {
             this.remove_request_btn = false;
         }
 
-        }).catch((errors) => {
-          //console.log(errors);
-         
-          var message = "Something goes wrong try again";
+        
+      }else{
+          var message = "Your not belong to Finance Deptartiment";
           this.$toast.error(message,{duration: 7000,dismissible: true,})
-          this.remove_request_btn = false;
-        });
+    }
     },
-    allLevel() {
-      axios.get(this.$store.state.api_url + "/levels").then((response) => {
+    async allLevel() {
+        var response = await axios.get(this.$store.state.api_url + "/levels")
         //console.log(response.data);
         this.levels = response.data;
-      });
+    
     },
-    allClaszs() {
-      axios.get(this.$store.state.api_url + "/class").then((response) => {
+    async allFees() {
+        var response = await axios.get(this.$store.state.api_url + "/level-fees")
+        //console.log(response.data);
+        this.fees = response.data;
+      
+    },
+    async allClaszs() {
+        var response = await  axios.get(this.$store.state.api_url + "/class")
         console.log(response.data);
         this.claszs = response.data;
-      });
+     
     },
     isAuth() {
       var user = localStorage.getItem("user");
@@ -787,16 +843,18 @@ export default {
         user = JSON.parse(user);
         this.user_id = user.id;
         this.role_id = user.role_id;
+        this.department_id = user.department_id;
       }
     },
   },
   created() {
-   
+    this.isAuth();
     this.getAdmissionType();
-    this.pendingStudents();
+    //this.pendingStudents();
     this.allLevel();
     this.allClaszs();
-    this.isAuth();
+    this.allFees();
+    
   },
 };
 </script>

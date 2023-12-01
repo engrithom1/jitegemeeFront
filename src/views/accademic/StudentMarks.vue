@@ -19,6 +19,11 @@
               </div>
             </div>
             <div class="full progress_bar_inner">
+                  <p v-if="this.deactive_exams.length > 0" class="alert alert-info m-3">Some Exam are closed (
+                    <span v-for="de_exam in deactive_exams" :key="de_exam.id">
+                      <strong class="text-capitalized">{{ de_exam.examname+", " }}</strong>
+                    </span>
+                  )</p>
                   <form action="#" class="p-3">
                     <div class="form-group">
                       <label for="pgender"
@@ -295,6 +300,7 @@
         academic_year: new Date().getFullYear(),
         exam_marks:[],
         active_exams:[],
+        deactive_exams:[],
         exam_id:"",
         user_id:"",
         role_id:"",
@@ -321,7 +327,7 @@
     },refleshPage(){
       window.location.reload();
     },
-      getStudentsClass(){
+      async getStudentsClass(){
 
         var year = this.academic_year;
 
@@ -333,33 +339,41 @@
         var subjects = this.selected_class.subjects;
         var exam_id = this.exam_id;
 
-        axios.post(this.$store.state.api_url + "/class_students",{'class_id':class_id,'subjects':subjects,'exam_id':exam_id,'year':year}).then((response) => {
-        console.log(response.data);
+        var response = await axios.post(this.$store.state.api_url + "/class_students",{'class_id':class_id,'subjects':subjects,'exam_id':exam_id,'year':year})
+        .catch((errors) => {
+          //console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
+        //console.log(response.data);
 
         this.students = response.data.students;
         this.subjects = response.data.subjects;
         this.hosted = response.data.hosted;
 
         this.find_clas = !this.find_clas
-        });
       }
 
       },
-      refleshStudents(){
+      async refleshStudents(){
 
         var year = this.academic_year;
         var class_id = this.selected_class.id;
         var exam_id = this.exam_id;
 
-        axios.post(this.$store.state.api_url + "/reflesh_students",{'class_id':class_id,'exam_id':exam_id,'year':year}).then((response) => {
+        var response = await axios.post(this.$store.state.api_url + "/reflesh_students",{'class_id':class_id,'exam_id':exam_id,'year':year})
+        .catch((errors) => {
+          //console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
         //console.log(response.data);
         this.students = response.data.students;
         this.hosted = response.data.hosted;
         //this.find_clas = !this.find_clas
 
-        }); 
       },
-      selectedStudent(student){
+      async selectedStudent(student){
         this.fail_mark = ""
         this.selected_student = student;
 
@@ -368,37 +382,36 @@
         var year = this.academic_year;
         var level_id = this.level_id;
 
-        axios.post(this.$store.state.api_url + "/student_mark_recorded",{'student_id':student_id,'exam_id':exam_id,'year':year,'level_id':level_id}).then((response) => {
+        var response = await axios.post(this.$store.state.api_url + "/student_mark_recorded",{'student_id':student_id,'exam_id':exam_id,'year':year,'level_id':level_id})
         //console.log(response.data);
         this.exam_marks = response.data;
-        });
       },
-      allLevel() {
-      axios.get(this.$store.state.api_url + "/levels").then((response) => {
+      async allLevel() {
+        var response = await axios.get(this.$store.state.api_url + "/levels")
         //console.log(response.data);
         this.levels = response.data;
-      });
+    
     },
-    activeExams() {
-      axios.get(this.$store.state.api_url + "/active_exams").then((response) => {
-        //console.log(response.data);
-        this.active_exams = response.data;
-      });
+    async activeExams() {
+      var response = await axios.get(this.$store.state.api_url + "/exams")
+        var exams = response.data
+        this.active_exams = exams.filter((i) => i.status == 'active');
+        this.deactive_exams = exams.filter((i) => i.status == 'deactive');
+ 
     },
-    levelSelected() {
+    async levelSelected() {
       this.search_class = true;
       //alert('level ni '+this.level_id);
       var level_id = this.level_id;
-      axios.post(this.$store.state.api_url + "/class_level",{'level_id':level_id}).then((response) => {
+      var response = await axios.post(this.$store.state.api_url + "/class_level",{'level_id':level_id})
         //console.log(response.data);
-        
         this.clasz = response.data.claszs;
-      });
+
     },
     classSelected(){
       this.search_class = false;
     },
-    addExamMarks(){
+    async addExamMarks(){
 
         this.fail_mark = ""
 
@@ -414,7 +427,12 @@
         var user_id = this.user_id
         var role_id = this.role_id
 
-        axios.post(this.$store.state.api_url + "/create-exam-mark",{user_id,exam_id,role_id,mark,subject_id,year,level_id,student_id,class_id}).then((response) => {
+        var response = await axios.post(this.$store.state.api_url + "/create-exam-mark",{user_id,exam_id,role_id,mark,subject_id,year,level_id,student_id,class_id})
+        .catch((errors) => {
+          console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
         
         if(response.data.success){
           this.fail_mark = ""
@@ -431,9 +449,8 @@
           document.getElementById("max_submit_btn").disabled = false;
         }
         
-      }); 
     },
-    hostResults(){
+    async hostResults(){
       var subl = this.subjects.length;
       var studs = this.students;
       var check = true;
@@ -448,14 +465,19 @@
 
       studs.forEach(function(stud){
         if(stud.exam_marks_count < subl){
-          console.log('hapoooo');
+          //console.log('hapoooo');
           check = false
           count_studs += 1;
         }
       });
         if(check){
           //peform action
-          axios.post(this.$store.state.api_url + "/host-exam-mark",{user_id,exam_id,role_id,year,level_id,class_id,subl}).then((response) => {
+         var response = await axios.post(this.$store.state.api_url + "/host-exam-mark",{user_id,exam_id,role_id,year,level_id,class_id,subl})
+          .catch((errors) => {
+          console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
         
         if(response.data.success){
           alert(response.data.message)
@@ -465,7 +487,6 @@
           alert(response.data.message)
         }
         
-        }); 
         }else{
           //perform not alert
           alert('sio poa wanafunzi '+count_studs+', hawajawekewa marks');
@@ -483,7 +504,7 @@
         this.change_n_mark = 0
         this.change_subs = exam.subs
     },
-    changeMarks(){
+    async changeMarks(){
 
       this.fail_mark = ""
       var user_id = this.user_id
@@ -503,7 +524,12 @@
 
       }else{
         
-      axios.post(this.$store.state.api_url + "/update-exam-mark",{user_id,role_id,id,mark,change_user_id,level_id,year,exam_id,student_id}).then((response) => {
+      var response = await axios.post(this.$store.state.api_url + "/update-exam-mark",{user_id,role_id,id,mark,change_user_id,level_id,year,exam_id,student_id})
+      .catch((errors) => {
+          console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
         
         if(response.data.success){
           this.fail_mark = ""
@@ -515,7 +541,6 @@
           console.log(response.data.examx);
           this.exam_marks = response.data.examx
         }
-      });
       }
 
         this.change_mark_bool = false

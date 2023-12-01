@@ -52,9 +52,18 @@
                 <div class="col-md-12">
                   <div class="inbox-body">
                     <div class="mail-option">
-                      <table class="table table-inbox table-hover">
+                      <div v-if="this.loading" class="container mt-5 mb-5">
+                          <div class="row">
+                            <div class="span4">
+                              <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                            </div>
+                            <div class="span4"></div>
+                          </div>
+                      </div>
+                      <table v-if="!this.loading" class="table table-inbox table-hover">
                         <thead>
-                          <th><b>departments Name</b></th>
+                          <th><b>Departments</b></th>
+                          <th><b>Staff</b></th>
                           <th><b>Action</b></th>
                         </thead>
                         <tbody>
@@ -66,8 +75,11 @@
                             <td class="">
                               {{ department.department }}
                             </td>
+                            <td class="">
+                              {{ department.staff_count }}
+                            </td>
                             <td class="view-message">
-                              <button :disabled="this.form.role_id != 4"
+                              <button :disabled="this.form.role_id != 4 || department.id < 4"
                                 @click="
                                   getEdit(department.id, department.department)
                                 "
@@ -77,7 +89,7 @@
                               >
                                 <i class="fa fa-edit"></i>
                               </button>
-                              <button :disabled="this.form.role_id != 4"
+                              <button :disabled="this.form.role_id != 4 || department.id < 4"
                                 class="btn btn-sm btn-danger"
                                 @click="
                                   deleteDepartment(
@@ -160,6 +172,7 @@ export default {
       departments: [],
       errors: [],
       edit_errors: [],
+      loading:true,
       form: {
         department: "",
         role_id: "",
@@ -171,11 +184,12 @@ export default {
     };
   },
   methods: {
-    allDepartments() {
-      axios.get(this.$store.state.api_url + "/departments").then((response) => {
+    async allDepartments() {
+      var response = await axios.get(this.$store.state.api_url + "/departments")
         //console.log(response.data);
         this.departments = response.data;
-      });
+        this.loading = false;
+    
     },
     getEdit(id, department) {
       this.edit_errors = [];
@@ -183,24 +197,26 @@ export default {
       this.og_department = department;
       this.edit_department = department;
     },
-    addNewDepartment() {
+    async addNewDepartment() {
       this.errors = [];
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/create-department", this.form)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.departments = response.data.departments;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
-            this.errors = response.data.message;
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
           }
-        })
-        .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
-        });
+ 
+       
     },
-    upateDepartment() {
+    async upateDepartment() {
       this.errors = [];
       var data = {
         department: this.edit_department,
@@ -209,22 +225,24 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/update-department", data)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.departments = response.data.departments;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
             this.errors = response.data.message;
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
           }
-        })
-        .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
-        });
+      
     },
-    deleteDepartment(id, department) {
+    async deleteDepartment(id, department) {
       this.errors = [];
       var data = {
         department_id: id,
@@ -232,20 +250,22 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/delete-department", data)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.departments = response.data.departments;
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
-            alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
           }
-        })
-        .catch((errors) => {
-          console.log(errors);
-          alert("Network or Server Errors");
-        });
+      
+       
     },
     isAuth() {
       var user = localStorage.getItem("user");
@@ -258,8 +278,9 @@ export default {
     },
   },
   created() {
-    this.allDepartments();
     this.isAuth();
+    this.allDepartments();
+    
     /*axios.defaults.headers.common["Authorization"] =
       "Bearer " + localStorage.getItem("user_token");*/
   },

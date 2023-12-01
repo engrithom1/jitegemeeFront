@@ -38,6 +38,10 @@ import Mates from "../views/student_pages/Mates.vue"
 import Results from "../views/student_pages/Results.vue"
 import Payments from "../views/student_pages/Payments.vue"
 
+//othrs
+import Controls from "../views/others/Controls.vue"
+import Profile from "../views/others/ProfilePage.vue"
+
 import Dev from "../views/Dev.vue"
 
 const routes = [
@@ -174,6 +178,17 @@ const routes = [
     component: Teachers
   },
 
+  ///other
+  {
+    path: '/controls',
+    name: 'Controls',
+    component: Controls
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile
+  },
 
   
 ]

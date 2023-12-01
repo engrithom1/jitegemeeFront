@@ -6,12 +6,12 @@
         <div class="sidebar_blog_1">
           <div class="sidebar-header">
             <div class="logo_section">
-              <a href="index.html"
+              <router-link to="/"
                 ><img
                   class="logo_icon img-responsive"
                   src="/assets/images/logo/jite.jpg"
                   alt="#"
-              /></a>
+              /></router-link>
             </div>
           </div>
           <div class="sidebar_user_info">
@@ -153,7 +153,7 @@
             <li v-if="user.role_id == 1">
               <router-link to="/student-fees-payments"
                 ><i class="fa fa-money purple_color2"></i>
-                <span>Fees Mayments</span></router-link
+                <span>Fees Payments</span></router-link
               >
             </li>
 
@@ -235,16 +235,16 @@
               >
               <ul class="collapse list-unstyled" id="setting">
                 <li v-if="user.role_id > 3">
-                  <a href="dashboard.html">> <span>control</span></a>
+                  <router-link to="/controls">> <span>Controls</span></router-link>
                 </li>
-                <li v-if="user.role_id > 3">
+                <!--li v-if="user.role_id > 3">
                   <a href="dashboard.html">> <span>Logs</span></a>
+                </li-->
+                <li>
+                  <router-link to="/profile">> <span>Profile</span></router-link>
                 </li>
                 <li>
-                  <a href="dashboard.html">> <span>Profile</span></a>
-                </li>
-                <li>
-                  <a @click="logout">> <span>Log Out</span></a>
+                  <a @click="logout"> <span>Log Out</span></a>
                 </li>
               </ul>
             </li>

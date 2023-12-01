@@ -59,12 +59,12 @@
 
                     <div class="col-md-2 form-group">
                       <label>Select Class*</label>
-                  <select required v-on:change="classSelected()" class="form-control" v-model="this.selected_class">
-                    <option :value="{'id':0}">All Classes</option>
+                  <select required class="form-control" v-model="this.selected_class">
+                    <option :value="0">All Classes</option>
                     <option
-                      v-for="clas in clasz"
+                      v-for="clas in clazzs"
                       :key="clas.id"
-                      :value="clas"
+                      :value="clas.id"
                     >
                       {{ clas.classname }}
                     </option>
@@ -148,14 +148,15 @@
       return{
         pos:0,
         levels: [],
-        clasz:[],
+        claszs:[],
+        clazzs:[],
         academic_year: new Date().getFullYear(),
         user_id:"",
         exam_id:"",
         role_id:"",
         class_id:"",
         level_id:"",
-        selected_class:{},
+        selected_class:0,
         exams:[],
         search_class:true,
         fail_mark:"",
@@ -175,62 +176,72 @@
       refleshPage(){
       window.location.reload();
       }, 
-      refleshStudents(){
+      async refleshStudents(){
 
         var year = this.academic_year;
-        var class_id = this.selected_class.id;
+        var class_id = this.selected_class;
         var exam_id = this.exam_id;
 
-        axios.post(this.$store.state.api_url + "/reflesh_students",{'class_id':class_id,'exam_id':exam_id,'year':year}).then((response) => {
+        var response = await axios.post(this.$store.state.api_url + "/reflesh_students",{'class_id':class_id,'exam_id':exam_id,'year':year})
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
         //console.log(response.data);
         this.students = response.data.students;
         this.hosted = response.data.hosted;
         //this.find_clas = !this.find_clas
 
-        }); 
+  
         },
-      allLevel() {
-      axios.get(this.$store.state.api_url + "/levels").then((response) => {
+      async allLevel() {
+        var response = await axios.get(this.$store.state.api_url + "/levels")
         //console.log(response.data);
         this.levels = response.data;
-      });
+
     },
-    allExams() {
-      axios.get(this.$store.state.api_url + "/exams").then((response) => {
+    async allClaszs() {
+      var response = await axios.get(this.$store.state.api_url + "/class")
+        //console.log(response.data);
+        this.claszs = response.data;
+   
+    },
+    async allExams() {
+      var response = await axios.get(this.$store.state.api_url + "/exams")
         //console.log(response.data);
         this.exams = response.data;
-      });
+  
     },
     levelSelected() {
       this.search_class = true;
       //alert('level ni '+this.level_id);
       var level_id = this.level_id;
-      axios.post(this.$store.state.api_url + "/class_level",{'level_id':level_id}).then((response) => {
-        //console.log(response.data);
-        
-        this.clasz = response.data.claszs;
-      });
-    },
-    classSelected(){
+      if (level_id >= 1 && level_id <= 6) {
+        let level = this.levels.find((i) => i.id === level_id);
+        let clazs = this.claszs.filter((i) => i.level === level.level);
+        this.clazzs = clazs;
+      } 
       this.search_class = false;
     },
-    searchResults(){
+    async searchResults(){
 
         var year = this.academic_year;
-        var class_id = this.selected_class.id;
+        var class_id = this.selected_class;
         var exam_id = this.exam_id;
         var level_id = this.level_id;
 
-        console.log(this.selected_class)
+        //console.log(this.selected_class)
 
         console.log(year+", "+class_id+" ,"+exam_id+", "+level_id)
 
-        axios.post(this.$store.state.api_url + "/fetch_exam_results",{'class_id':class_id,'exam_id':exam_id,'year':year,'level_id':level_id}).then((response) => {
+        var response = await axios.post(this.$store.state.api_url + "/fetch_exam_results",{'class_id':class_id,'exam_id':exam_id,'year':year,'level_id':level_id})
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
         //console.log(response.data);
         this.results = response.data.results;
         //this.find_clas = !this.find_clas
-
-        }); 
     },
     },
       computed:{
@@ -238,6 +249,7 @@
     created() {
     this.allExams();
     this.allLevel();
+    this.allClaszs();
     this.isAuth();
   },
   }

@@ -86,14 +86,8 @@
                             id="gender"
                             required
                           >
-                            <option
-                              class="text-capitalize"
-                              v-for="gender in genders"
-                              :key="gender.id"
-                              :value="gender.id"
-                            >
-                              {{ gender.gender }}
-                            </option>
+                            <option class="text-capitalize" value="1">Male</option>
+                            <option class="text-capitalize" value="2">Female</option>
                           </select>
                         </div>
                         <div class="form-group">
@@ -117,6 +111,8 @@
                             class="form-control"
                             v-model="this.form.phone"
                             placeholder="0768448525"
+                            minlength="10"
+                            maxlength="10"
                             required
                           />
                         </div>
@@ -132,7 +128,7 @@
                         </div>
 
                         <div class="form-group">
-                          <label for="home_address">Home address*</label>
+                          <label for="home_address">Residence*</label>
                           <input
                             type="text"
                             class="form-control"
@@ -324,6 +320,7 @@ export default {
       loading:true,
       parents: [],
       errors: [],
+      genders:[],
       search_errors: [],
       search: {
         search_parent: "",
@@ -341,6 +338,7 @@ export default {
         photo: "man.png",
         user_id: "",
         role_id: "",
+        department_id:""
       },
     };
   },
@@ -349,46 +347,47 @@ export default {
       this. allParents();
       this.add_parent = !this.add_parent;
     },
-    getGender() {
-      axios.get(this.$store.state.api_url + "/genders").then((response) => {
-        console.log(response.data);
+    async getGender() {
+      var response = await axios.get(this.$store.state.api_url + "/genders")
+        //console.log(response.data);
         this.genders = response.data;
-      });
+      
     },
-    searchParent() {
+    async searchParent() {
       this.loading = true;
       this.search_errors = []
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/search-parent", this.search)
-        .then((response) => {
-          this.loading = false;
-          if (response.data.success) {
-            this.parents = response.data.parents;
-            //console.log(response.data.parents);
-            
-          } else {
-           
-            this.search_errors = response.data.message;
-          }
-        })
         .catch((errors) => {
-          
+          this.loading = false;
           var message = "Network or Server Errors";
           this.$toast.error(message,{duration: 7000,dismissible: true,})
         });
+
+        this.loading = false;
+          if (response.data.success) {
+            this.parents = response.data.parents;
+            //console.log(response.data.parents);
+          } else {
+            this.search_errors = response.data.message;
+          }
     },
-    allParents() {
-      axios.get(this.$store.state.api_url + "/parents").then((response) => {
+    async allParents() {
+      var response = await axios.get(this.$store.state.api_url + "/parents")
         //console.log(response.data);
         this.parents = response.data;
         this.loading = false;
-      });
     },
-    addParent() {
+    async addParent() {
       this.errors = [];
-      axios
+      if(this.form.role_id == 4 || this.form.department_id == 2){
+        var response = await axios
         .post(this.$store.state.api_url + "/create-parent", this.form)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
+        
           if (response.data.success) {
            
             var message = response.data.message;
@@ -398,43 +397,27 @@ export default {
           } else {
             this.errors = [response.data.message];
           }
-        })
-        .catch((errors) => {
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
-    },
-    imageProcess(e) {
-      let file = e.target.files[0];
-      let reader = new FileReader();
-
-
-      if (file["size"] < 1111775) {
-        reader.onloadend = (file) => {
-          console.log("RESULT", reader.result);
-          this.form.photo = reader.result;
-        };
-        reader.readAsDataURL(file);
-      } else {
-      
-        //swal("Congrats!", ", Your account is created!", "success");
+      }else{
+        var message = "Your not belong to Admission Deptartiment";
+          this.$toast.error(message,{duration: 7000,dismissible: true,}) 
       }
     },
-
+    
     isAuth() {
       var user = localStorage.getItem("user");
       var token = localStorage.getItem("user_token");
       if (user && token) {
         user = JSON.parse(user);
         this.form.user_id = user.id;
+        this.form.department_id = user.department_id;
         this.form.role_id = user.role_id;
       }
     },
   },
   created() {
+    this.isAuth();
     this.allParents();
     this.getGender();
-    this.isAuth();
   },
 };
 </script>

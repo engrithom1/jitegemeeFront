@@ -228,18 +228,16 @@
       };
     },
     methods: {
-      allCourses() {
-        axios.get(this.$store.state.api_url + "/courses").then((response) => {
-         
+      async allCourses() {
+        var response = await axios.get(this.$store.state.api_url + "/courses")
           this.courses = response.data;
           this.loading = false;
-        });
+
       },
-      allSubjects() {
-        axios.get(this.$store.state.api_url + "/subjects").then((response) => {
+      async allSubjects() {
+        var response = await axios.get(this.$store.state.api_url + "/subjects")
           //console.log(response.data);
-          this.subjects = response.data;
-        });
+          this.subjects = response.data.filter((i) => i.level_id === 8);
       },
       getEdit(id, coursename, subjects) {
         this.edit_errors = [];
@@ -248,7 +246,7 @@
         this.edit_coursename = coursename;
         this.edit_subjects = subjects.split(",");
       },
-      addNewCourse() {
+      async addNewCourse() {
         this.errors = [];
         var subjectz = this.form.s_subjects;
         var subject_names = ""
@@ -274,9 +272,12 @@
           subject_names : subject_names
         };
         console.log(data)
-        axios
+        var response = await axios
           .post(this.$store.state.api_url + "/create-course", data)
-          .then((response) => {
+          .catch((errors) => {
+            var message = "Network or Server Errors";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
+          });
             if (response.data.success) {
               this.courses = response.data.courses.filter((i) => i.id > 1);
               var message = response.data.message;
@@ -287,14 +288,9 @@
             } else {
               this.errors = response.data.message;
             }
-          })
-          .catch((errors) => {
-            var message = "Network or Server Errors";
-            this.$toast.error(message,{duration: 7000,dismissible: true,})
-          });
         }
       },
-      updateCourse() {
+      async updateCourse() {
         this.errors = [];
         var subjectz = this.edit_subjects
         var subject_names = ""
@@ -319,9 +315,13 @@
           role_id: this.form.role_id,
           subject_names : subject_names
         };
-        axios
+        var response = await axios
           .post(this.$store.state.api_url + "/update-course", data)
-          .then((response) => {
+          .catch((errors) => {
+            var message = "Network or Server Errors";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
+          });
+
             if (response.data.success) {
               this.courses = response.data.courses.filter((i) => i.id > 1)
               this.course_id =""
@@ -333,14 +333,11 @@
             } else {
               this.edit_errors = response.data.message;
             }
-          })
-          .catch((errors) => {
-            var message = "Network or Server Errors";
-            this.$toast.error(message,{duration: 7000,dismissible: true,})
-          });
+        
+          
         }
       },
-      deleteCourse(id, coursename) {
+      async deleteCourse(id, coursename) {
         this.errors = [];
         var data = {
           id: id,
@@ -348,9 +345,12 @@
           user_id: this.form.user_id,
           role_id: this.form.role_id,
         };
-        axios
+        var response = await axios
           .post(this.$store.state.api_url + "/delete-course", data)
-          .then((response) => {
+          .catch((errors) => {
+            var message = "Network or Server Errors";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
+          });
             if (response.data.success) {
               this.courses = response.data.courses.filter((i) => i.id > 1);
               var message = response.data.message;
@@ -359,11 +359,7 @@
               var message = response.data.message;
               this.$toast.error(message,{duration: 7000,dismissible: true,})
             }
-          })
-          .catch((errors) => {
-            var message = "Network or Server Errors";
-            this.$toast.error(message,{duration: 7000,dismissible: true,})
-          });
+         
       },
       isAuth() {
         var user = localStorage.getItem("user");

@@ -155,28 +155,26 @@
                       <div class="row">
                         <div class="col-sm-6 col-md-6">
                           <div class="form-group">
-                            <label for="sindex">PREM Number*</label>
+                            <label for="sindex">PREM Number</label>
                             <input
                               type="text"
                               class="form-control"
                               v-model="this.form.prem_no"
-                              minlength="4"
-                              maxlength="20"
                               placeholder="0000"
-                              required
+                              
                             />
                           </div>
                         </div>
                         <div class="col-sm-6 col-md-6">
                           <div class="form-group">
-                            <label for="sindex">Admission Number*</label>
+                            <label for="sindex">Admission Number* <span class="text-danger">{{ this.proposed_index_no }}</span></label>
                             <input
                               type="text"
                               class="form-control"
                               v-model="this.form.index_no"
-                              minlength="4"
+                              minlength="6"
                               maxlength="6"
-                              placeholder="0000"
+                              placeholder="400000"
                               required
                             />
                           </div>
@@ -213,7 +211,7 @@
                         />
                       </div>
                       <div class="form-group">
-                        <label for="shome">Home address*</label>
+                        <label for="shome">Residence*</label>
                         <input
                           type="text"
                           class="form-control"
@@ -222,15 +220,7 @@
                           required
                         />
                       </div>
-                      <div class="form-group">
-                        <label for="semail">Email address</label>
-                        <input
-                          type="email"
-                          class="form-control"
-                          v-model="this.form.email"
-                          placeholder="john@gmail.com"
-                        />
-                      </div>
+                      
                       <div class="row">
                         <div class="col-sm-12 col-md-6">
                           <div class="form-group">
@@ -244,12 +234,24 @@
                             />
                           </div>
                           <div class="form-group">
+                            <label for="sphone">Religion*</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              v-model="this.form.religion"
+                              placeholder="free"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
                             <label for="sphone">Phone</label>
                             <input
                               type="text"
                               class="form-control"
                               v-model="this.form.phone"
-                              placeholder="255768448525"
+                              placeholder="0768448525"
+                              minlength="10"
+                              maxlength="10"
                             />
                           </div>
                           <div class="form-group">
@@ -263,6 +265,16 @@
                             />
                           </div>
                           <div class="form-group">
+                            <label for="sdate">Birth Place*</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              v-model="this.form.birth_place"
+                              aria-describedby="emailHelp"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
                           <label for="gender">Gender*</label>
                           <select
                             class="form-control"
@@ -270,14 +282,8 @@
                             id="gender"
                             required
                           >
-                            <option
-                              class="text-capitalize"
-                              v-for="gender in genders"
-                              :key="gender.id"
-                              :value="gender.id"
-                            >
-                              {{ gender.gender }}
-                            </option>
+                            <option class="text-capitalize" value="1">Male</option>
+                            <option class="text-capitalize" value="2">Female</option>
                           </select>
                         </div>
                           <div class="form-group">
@@ -354,6 +360,16 @@
                               </option>
                             </select>
                           </div>
+                          <div v-if="!transfer_in" class="form-group">
+                            <label for="sphone">Former School*</label>
+                            <input
+                              v-model="this.form.former_school"
+                              type="text"
+                              class="form-control"
+                              required
+                              placeholder="Msamala secondary"
+                            />
+                          </div>
                           <div v-if="transfer_in">
                             <div class="form-group">
                               <label for="sphone">School From*</label>
@@ -411,7 +427,22 @@
                               </option>
                             </select>
                           </div>
-                          <!--div class="form-group">
+                          <div class="form-group">
+                            <label for="pgender">Accademic Year*</label>
+                            <input
+                              type="number"
+                              :max="this.c_year+1"
+                              :min="this.c_year-1"
+                              maxlength="4"
+                              minlength="4"
+                              class="form-control"
+                              :placeholder="this.c_year"
+                              v-model="this.form.accademic_year"
+                              aria-describedby="emailHelp"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
                             <label for="pgender">Level*</label>
                             <select
                               class="form-control"
@@ -444,26 +475,13 @@
                                 {{ clasz.classname }}
                               </option>
                             </select>
-                          </div-->
-                          <div class="form-group">
-                            <label for="pgender">Accademic Year*</label>
-                            <input
-                              type="number"
-                              v-max="this.c_year+2"
-                              maxlength="4"
-                              minlength="4"
-                              class="form-control"
-                              :placeholder="this.c_year"
-                              v-model="this.form.accademic_year"
-                              aria-describedby="emailHelp"
-                              required
-                            />
                           </div>
+                          
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="exampleFormControlTextarea1"
-                          >Hearth and Behavior</label
+                          >Physical disabilities and Behavior</label
                         >
                         <textarea
                           class="form-control"
@@ -539,6 +557,7 @@
 
 <script>
 import axios from "axios";
+
 export default {
   data() {
     return {
@@ -546,6 +565,7 @@ export default {
       transfer_in: false,
       class_disabled: true,
       c_year: new Date().getFullYear(),
+      proposed_index_no:"433123",
       genders:[],
       entrys:[],
       healths:[],
@@ -559,6 +579,7 @@ export default {
       relations: [],
       adm_types:[],
       search_errors: [],
+      fees:[],
       loading:true,
       search: {
         search_parent: "",
@@ -566,15 +587,18 @@ export default {
       form: {
         email: "",
         index_no: "",
-        prem_no:"",
+        prem_no:'0',
         first_name: "",
         last_name: "",
         middle_name: "",
         gender: "",
         phone: "",
+        religion: "",
+        birth_place: "",
+        former_school: "",
         home_address: "",
         nationality: "",
-        accademic_year: new Date().getFullYear(),
+        accademic_year: "",
         regist_year: new Date().getFullYear(),
         birth_date: "",
         behavior: "",
@@ -590,10 +614,21 @@ export default {
         role_id: "",
         entry: "",
         admission: "",
+        department_id: "" 
       },
     };
   },
   methods: {
+    async allFees() {
+      var response = await axios.get(this.$store.state.api_url + "/level-fees")
+        //console.log(response.data);
+        this.fees = response.data;
+    },
+    async proposedIndexNo(){
+      var response = await axios.get(this.$store.state.api_url + "/proposed-index-no")
+        //console.log(response.data);
+        this.proposed_index_no = response.data; 
+    },
     selectParent(
       id,
       first_name,
@@ -613,6 +648,7 @@ export default {
         photo,
         home_address,
         gender,
+        
       };
       this.parent_exist = true;
     },
@@ -628,8 +664,10 @@ export default {
       }
     },
     levelClass() {
-      if (this.form.level_id >= 1 && this.form.level_id <= 6) {
-        let level = this.levels.find((i) => i.id === this.form.level_id);
+      var level_id = this.form.level_id;
+      
+      if (level_id >= 1 && level_id <= 6) {
+        let level = this.levels.find((i) => i.id === level_id);
         let clazs = this.claszs.filter((i) => i.level === level.level);
         this.clazzs = clazs;
         this.class_disabled = false;
@@ -637,11 +675,15 @@ export default {
         this.class_disabled = true;
       }
     },
-    searchParent() {
+    async searchParent() {
       this.loading = true;
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/search-parent", this.search)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
+
           if (response.data.success) {
             this.parents = response.data.parents;
             //console.log(response.data.parents);
@@ -649,74 +691,96 @@ export default {
           } else {
             this.search_errors = response.data.message;
           }
-        })
-        .catch((errors) => {
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+        
     },
-    allParents() {
-      axios.get(this.$store.state.api_url + "/parents").then((response) => {
+    async allParents() {
+      var response = await axios.get(this.$store.state.api_url + "/parents")
         //console.log(response.data);
         this.parents = response.data;
         this.loading = false;
-      });
     },
-    allParentStatus() {
-      axios.get(this.$store.state.api_url + "/parent-status").then((response) => {
+    async allParentStatus() {
+      var response = await axios.get(this.$store.state.api_url + "/parent-status")
         //console.log(response.data);
         this.parent_ss = response.data;
-      });
+    
     },
-    getGender() {
-      axios.get(this.$store.state.api_url + "/genders").then((response) => {
+    async getGender() {
+      var response = await axios.get(this.$store.state.api_url + "/genders")
         //console.log(response.data);
         this.genders = response.data;
-      });
     },
-    getHealthStatus() {
-      axios.get(this.$store.state.api_url + "/healths").then((response) => {
+    async getHealthStatus() {
+      var response = await axios.get(this.$store.state.api_url + "/healths")
         //console.log(response.data);
         this.healths = response.data;
-      });
     },
-    getRelations() {
-      axios.get(this.$store.state.api_url + "/relations").then((response) => {
+    async getRelations() {
+      var response = await axios.get(this.$store.state.api_url + "/relations")
         //console.log(response.data);
         this.relations = response.data;
-      });
     },
-    getAdmissionType() {
-      axios.get(this.$store.state.api_url + "/admissions").then((response) => {
+    async getAdmissionType() {
+      var response = await axios.get(this.$store.state.api_url + "/admissions")
         //console.log(response.data);
         this.adm_types = response.data;
-      });
     },
-    getEntryType() {
-      axios.get(this.$store.state.api_url + "/entrys").then((response) => {
+    async getEntryType() {
+      var response = await axios.get(this.$store.state.api_url + "/entrys")
         //console.log(response.data);
         this.entrys = response.data;
-      });
     },
-    addStudent() {
+    async addStudent() {
       
       var accademic_year = this.form.accademic_year;
       var birth_date = this.form.birth_date;
       var birth = birth_date.split("-")[0];
       var Yearz = accademic_year - birth;
 
-      if (Yearz < 12) {
+      var level_id = parseInt(this.form.level_id)
+
+      
+      var fees = this.fees
+      var feef = []
+
+      if(level_id < 5){
+        fees.forEach(el => {
+        if(el.level_id == level_id && el.status == 1 || el.level_id == 0 && el.status == 1 || el.level_id == 7 && el.status == 1){
+          feef.push(el.id)
+        }
+      });
+      }
+      if(level_id > 4){
+        fees.forEach(el => {
+        if(el.level_id == level_id && el.status == 1 || el.level_id == 0 && el.status == 1 || el.level_id == 8 && el.status == 1){
+          feef.push(el.id)
+        }
+      });
+      }
+
+      var fees = feef.toString()
+
+      if(this.form.role_id == 4 || this.form.department_id == 2){
+          if (Yearz < 10) {
         var message = "Student is under Age 'only '" + Yearz + " !"
           this.$toast.error(message,{duration: 7000,dismissible: true,})
       } else {
         this.errors = [];
-        axios
+        if(this.transfer_in){
+          this.form.former_school = this.form.school_from
+        }
+        var response = await axios
           .post(this.$store.state.api_url + "/create-student", {
             ...this.form,
             parent_id: this.parent.id,
             parent_phone: this.parent.phone,
+            fees
           })
-          .then((response) => {
+          .catch((errors) => {
+            var message = "Network or Server Errors";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
+          });
+
             if (response.data.success) {
               this.form = {};
               this.parents = response.data.parents;
@@ -729,41 +793,24 @@ export default {
             } else {
               this.errors = [response.data.message];
             }
-          })
-          .catch((errors) => {
-            var message = "Network or Server Errors";
-            this.$toast.error(message,{duration: 7000,dismissible: true,})
-          });
+          
+      }
+      }else{
+        var message = "Your not belong to Admission Deptartiment";
+        this.$toast.error(message,{duration: 7000,dismissible: true,})
       }
     },
-    imageProcess(e) {
-      let file = e.target.files[0];
-      let reader = new FileReader();
-
-      alert("well it chabged");
-
-      if (file["size"] < 1111775) {
-        reader.onloadend = (file) => {
-          console.log("RESULT", reader.result);
-          this.form.photo = reader.result;
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert("You have Choose The file more than 2MB");
-        //swal("Congrats!", ", Your account is created!", "success");
-      }
-    },
-    allLevel() {
-      axios.get(this.$store.state.api_url + "/levels").then((response) => {
+    async allLevel() {
+      var response = await axios.get(this.$store.state.api_url + "/levels")
         //console.log(response.data);
         this.levels = response.data;
-      });
+     
     },
-    allClaszs() {
-      axios.get(this.$store.state.api_url + "/class").then((response) => {
+    async allClaszs() {
+      var response = await axios.get(this.$store.state.api_url + "/class")
         console.log(response.data);
         this.claszs = response.data;
-      });
+
     },
 
     isAuth() {
@@ -773,10 +820,13 @@ export default {
         user = JSON.parse(user);
         this.form.user_id = user.id;
         this.form.role_id = user.role_id;
+        this.form.department_id = user.department_id;
       }
     },
   },
   created() {
+    this.isAuth();
+    this.allFees();
     this.allParents();
     this.getGender();
     this.getRelations();
@@ -786,7 +836,7 @@ export default {
     this.allLevel();
     this.allClaszs();
     this.allParentStatus();
-    this.isAuth();
+    this.proposedIndexNo();
   },
 };
 </script>

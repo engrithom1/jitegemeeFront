@@ -2179,9 +2179,9 @@ i.icon {
 /** tabbar style 2 **/
 
 .tab_style2 .tabbar nav div.nav-tabs .nav-link.active {
-    background: #ff5722;
+    background: #6c757d;
     color: #fff;
-    border-color: #ff5722;
+    border-color: #6c757d;
 }
 
 
@@ -3433,4 +3433,16 @@ table.projects tr td:first-child {
 
 .v-toast__text {
     color: #fff !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f3f3f3 !important;
+}
+
+.flexible-div{
+    background: none repeat scroll 0 0 #fff;
+    border-radius: 0 4px 4px 0;
+    width: 100%;
+    float: left;
+    overflow: auto;
 }

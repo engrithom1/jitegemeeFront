@@ -335,23 +335,21 @@
       refleshPage(){
       window.location.reload();
       }, 
-      allLevel() {
-      axios.get(this.$store.state.api_url + "/levels").then((response) => {
+      async allLevel() {
+      var response = await axios.get(this.$store.state.api_url + "/levels")
         //console.log(response.data);
-        this.levels = response.data;
-      });
+      this.levels = response.data;
+    
     },
-    allClaszs() {
-      axios.get(this.$store.state.api_url + "/class").then((response) => {
+    async allClaszs() {
+      var response = await axios.get(this.$store.state.api_url + "/class")
         //console.log(response.data);
         this.allclass = response.data;
-      });
     },
     levelSelected() {
       this.search_class = true;
       var level_id = this.level_id;
-      let clazs = this.allclass.filter((i) => i.level_id === level_id);
-      this.clasz = clazs;
+      this.clasz = this.allclass.filter((i) => i.level_id == level_id);
     },
     classSelected(){
       this.search_class = false;
@@ -362,7 +360,7 @@
       this.subs_idz = a_class[0].subjects
       this.teacher_id = a_class[0].teacher_id
     },
-    getAttendanceRecords(){
+    async getAttendanceRecords(){
 
      var class_id = this.class_id;
      var role_id = this.role_id;
@@ -392,7 +390,14 @@
           this.records_btn = false;
      }else{
         
-        axios.post(this.$store.state.api_url + "/attendance_records",{role_id,class_id,date_from,date_to}).then((response) => {
+      var response = await axios.post(this.$store.state.api_url + "/attendance_records",{role_id,class_id,date_from,date_to})
+      .catch((errors) => {
+          console.log(errors);
+          this.records_btn = false;
+          
+            var message = "Something goes wrong try again";
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
         
         console.log(response.data);
         if (response.data.success) {
@@ -411,16 +416,9 @@
             this.records_btn = false;
         }
 
-        }).catch((errors) => {
-          console.log(errors);
-          this.records_btn = false;
-          
-            var message = "Something goes wrong try again";
-            this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
     }
  },
-    submitAttendance(){
+    async submitAttendance(){
      
         var year = this.academic_year;
         var class_id = this.class_id;
@@ -571,7 +569,12 @@
             ///////ends general class atendance
             }
 
-            axios.post(this.$store.state.api_url + "/submit_attendance",{role_id,subject_id,att_type,class_att,session_att,class_id,data_att}).then((response) => {
+            var response = await axios.post(this.$store.state.api_url + "/submit_attendance",{role_id,subject_id,att_type,class_att,session_att,class_id,data_att}).catch((errors) => {
+              //console.log(errors);
+              this.attendance_btn = false;
+              var message = "Something goes wrong try again";
+              this.$toast.success(message,{duration: 7000,dismissible: true,})
+            });
         
             console.log(response.data);
             if (response.data.success) {
@@ -587,24 +590,24 @@
                 this.$toast.error(message,{duration: 7000,dismissible: true,})
                 this.attendance_btn = false;
             }
-
-            }).catch((errors) => {
-              //console.log(errors);
-              this.attendance_btn = false;
-              var message = "Something goes wrong try again";
-              this.$toast.success(message,{duration: 7000,dismissible: true,})
-            });
           }
         }
     },
-    getClassStudents(){
+    async getClassStudents(){
 
         var class_id = this.class_id;
 
         this.search_btn = true;
         this.loading = true;
 
-        axios.post(this.$store.state.api_url + "/get_class_students",{'class_id':class_id}).then((response) => {
+        var response = await axios.post(this.$store.state.api_url + "/get_class_students",{'class_id':class_id})
+        .catch((errors) => {
+          console.log(errors);
+          this.search_btn = false;
+          var message = "Something goes wrong try again";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+          
+        });
         
         //console.log(response.data);
         if (response.data.success) {
@@ -614,10 +617,9 @@
 
              ///get subjects for a class
             var subs_idz = this.subs_idz 
-            axios.post(this.$store.state.api_url + "/class_subjects",{subs_idz}).then((response) => {
+            var res = await axios.post(this.$store.state.api_url + "/class_subjects",{subs_idz})
               //console.log(response.data);
-              this.subjects = response.data;
-            });
+              this.subjects = res.data;
 
 
         } else {
@@ -626,13 +628,6 @@
             this.search_btn = false;
         }
 
-        }).catch((errors) => {
-          console.log(errors);
-          this.search_btn = false;
-          var message = "Something goes wrong try again";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-          
-        });
     },
     },
       computed:{

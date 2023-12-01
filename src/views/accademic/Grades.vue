@@ -346,18 +346,17 @@ export default {
     };
   },
   methods: {
-    allGrades() {
-      axios.get(this.$store.state.api_url + "/grades").then((response) => {
+    async allGrades() {
+      var response = await axios.get(this.$store.state.api_url + "/grades")
         //console.log(response.data);
         this.grades = response.data;
         this.loading = false
-      });
     },
-    allLevel() {
-      axios.get(this.$store.state.api_url + "/levels").then((response) => {
+    async allLevel() {
+      var response = await axios.get(this.$store.state.api_url + "/levels")
         //console.log(response.data);
         this.levels = response.data;
-      });
+
     },
     getEdit(id, grade, mark1, mark2, point, grade_label) {
       this.edit_errors = [];
@@ -369,26 +368,24 @@ export default {
       this.edit_point = point;
       this.edit_grade_label = grade_label;
     },
-    addNewClass() {
+    async addNewClass() {
       this.errors = [];
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/create-grade", this.form)
-        .then((response) => {
+        .catch((errors) => {
+          //console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.grades = response.data.grades;
             var message = response.data.message;
             this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
             this.errors = [response.data.message];
-          }
-        })
-        .catch((errors) => {
-          console.log(errors);
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+          }   
     },
-    updateClass() {
+    async updateClass() {
       this.errors = [];
       var data = {
         grade: this.edit_grade,
@@ -401,9 +398,13 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/update-grade", data)
-        .then((response) => {
+        .catch((errors) => {
+          console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.grades = response.data.grades;
             var message = response.data.message;
@@ -411,14 +412,9 @@ export default {
           } else {
             this.edit_errors = [response.data.message];
           }
-        })
-        .catch((errors) => {
-          console.log(errors);
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+       
     },
-    deleteGrade(id, grade) {
+    async deleteGrade(id, grade) {
       this.errors = [];
       var data = {
         grade_id: id,
@@ -426,9 +422,13 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/delete-grade", data)
-        .then((response) => {
+        .catch((errors) => {
+          console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.grades = response.data.grades;
             var message = response.data.message;
@@ -437,12 +437,8 @@ export default {
             var message = response.data.message;
             this.$toast.success(message,{duration: 7000,dismissible: true,})
           }
-        })
-        .catch((errors) => {
-          console.log(errors);
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+    
+        
     },
     isAuth() {
       var user = localStorage.getItem("user");

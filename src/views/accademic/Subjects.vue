@@ -34,14 +34,26 @@
                   />
                 </div>
                 <div class="form-group">
+                          <label for="gender">Level*</label>
+                          <select
+                            class="form-control"
+                            v-model="this.form.level_id"
+                            id="gender"
+                            required
+                          >
+                            <option class="text-capitalize" value="7">O-Level</option>
+                            <option class="text-capitalize" value="8">A-level</option>
+                          </select>
+                        </div>
+                <div class="form-group">
                   <label for="code">Subject Code*</label>
                   <input
                     id="code"
                     type="text"
                     class="form-control"
                     v-model="this.form.code"
-                    minlength="4"
-                    maxlength="12"
+                    minlength="3"
+                    maxlength="3"
                     placeholder="code"
                     aria-describedby="emailHelp"
                   />
@@ -77,6 +89,7 @@
                         <thead>
                           <th><b>subjects Name</b></th>
                           <th><b>Code</b></th>
+                          <th><b>Level</b></th>
                           <th><b>Action</b></th>
                         </thead>
                         <tbody>
@@ -90,6 +103,9 @@
                             </td>
                             <td class="text-capitalize">
                               {{ subject.code }}
+                            </td>
+                            <td class="text-capitalize">
+                              {{ subject.level }}
                             </td>
                             <td class="view-message">
                               <button :disabled="this.form.role_id != 4"
@@ -176,8 +192,8 @@
                 type="text"
                 class="form-control"
                 v-model="this.edit_code"
-                minlength="4"
-                maxlength="12"
+                minlength="3"
+                maxlength="3"
                 placeholder="code"
                 aria-describedby="emailHelp"
               />
@@ -212,6 +228,7 @@ export default {
         code:"",
         role_id: "",
         user_id: "",
+        level_id:7,
       },
       subject_id: "",
       og_subject: "",
@@ -220,12 +237,12 @@ export default {
     };
   },
   methods: {
-    allSubjects() {
-      axios.get(this.$store.state.api_url + "/subjects").then((response) => {
+    async allSubjects() {
+      var response = await axios.get(this.$store.state.api_url + "/subjects-level")
         //console.log(response.data);
         this.subjects = response.data;
         this.loading = false;
-      });
+    
     },
     getEdit(id, subject, code) {
       this.edit_errors = [];
@@ -234,27 +251,28 @@ export default {
       this.edit_subject = subject;
       this.edit_code = code;
     },
-    addNewSubject() {
+    async addNewSubject() {
       this.errors = [];
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/create-subject", this.form)
-        .then((response) => {
+        .catch((errors) => {
+          //console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.subjects = response.data.subjects;
             
             var message = response.data.message;
             this.$toast.success(message,{duration: 7000,dismissible: true,})
           } else {
-            this.errors = [response.data.message];
+            //this.errors = [response.data.message];
+            var message = response.data.message;
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
           }
-        })
-        .catch((errors) => {
-          //console.log(errors);
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+     
     },
-    updateSubject() {
+    async updateSubject() {
       this.errors = [];
       var data = {
         subject: this.edit_subject,
@@ -264,9 +282,13 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/update-subject", data)
-        .then((response) => {
+        .catch((errors) => {
+          //console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.subjects = response.data.subjects;
            
@@ -275,14 +297,10 @@ export default {
           } else {
             this.errors = [response.data.message];
           }
-        })
-        .catch((errors) => {
-          //console.log(errors);
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+
+        
     },
-    deleteSubject(id, subject) {
+    async deleteSubject(id, subject) {
       this.errors = [];
       var data = {
         subject_id: id,
@@ -290,9 +308,13 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/delete-subject", data)
-        .then((response) => {
+        .catch((errors) => {
+          //console.log(errors);
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.subjects = response.data.subjects;
             var message = response.data.message;
@@ -302,12 +324,7 @@ export default {
             var message = response.data.message;
             this.$toast.error(message,{duration: 7000,dismissible: true,})
           }
-        })
-        .catch((errors) => {
-          //console.log(errors);
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+        
     },
     isAuth() {
       var user = localStorage.getItem("user");

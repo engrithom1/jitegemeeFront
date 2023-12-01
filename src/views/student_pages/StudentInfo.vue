@@ -3,6 +3,10 @@
     width: 80px;
     height: 80px;
 }
+.p-head{
+    font-size: 20px;
+    font-weight: 500;
+}
 </style>
 
 <template>
@@ -53,15 +57,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-12">
                     <div v-if="this.search_loading" class="container mt-5 mb-5">
                         <div class="row">
+                          <div class="span2"></div>  
                           <div class="span4">
                             <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
                           </div>
                           <div class="span4"></div>
                         </div>
-                      </div>
+                    </div>
                 </div>
             </div>
   
@@ -85,9 +90,9 @@
                                         <div class="col-12 d-flex justify-content-between mb-3">
                                             <img width="100" src="/assets/images/logo/jmis_logo-bg.png" alt="#" />
                                             <p class="text-center mt-3"> <strong class="text-center"> JITEGEMEE  HIGH  SCHOOL </strong><br/>Student Parent and Admission Details</p>
-                                            <h6 class="text-center mt-3">Cretated at:<br/>{{this.to_date}}</h6>
+                                            <h6 class="text-center mt-3">Cretated At<br/>{{this.to_date}}</h6>
                                         </div>
-                                       <div class="col-12">
+                                       <div class="col-sm-12 col-md-6">
                                         
                                           <div class="full invoice_blog">
                                              <h4>Personal</h4>
@@ -103,7 +108,7 @@
                                              </p>
                                           </div>
                                        </div>
-                                       <div class="col-12">
+                                       <div class="col-sm-12 col-md-6">
                                         
                                           <div class="full invoice_blog">
                                              <h4>Admission</h4>
@@ -117,12 +122,16 @@
                                                 <strong>Accademic Year: </strong>{{ admission.accademic_year }}<br>  
                                                 <strong>Class: </strong>{{ admission.level+", "+admission.classname }}<br>
                                                 <strong>Admission Type : </strong>{{admission.admission}}<br/>   
-                                                <strong>Entry Type : </strong>{{ admission.entry }} <span v-if="admission.entry_id == 2"> <strong>From</strong> {{admission.school_from}}<strong> Reason </strong> {{admission.transfer_reason }}</span><br>  
+                                                <strong>Entry Type : </strong>{{ admission.entry }}<br/> 
+                                                <span v-if="admission.entry_id == 2"> 
+                                                <strong>From : </strong> {{admission.school_from}}<br/>
+                                                <strong>Reason : </strong> {{admission.transfer_reason }}
+                                                </span> 
                                                 
                                              </p>
                                           </div>
                                        </div>
-                                       <div class="col-12">
+                                       <div class="col-sm-12 col-md-6">
                                           <div class="full invoice_blog">
                                              <h4>Parent </h4>
                                             <div v-if="this.parent_loading" class="container mt-5 mb-5">
@@ -162,96 +171,67 @@
                                     </div>
                                 </div>
                             </div>
+                            <div id="finance_info">
                             <div class="full">
-                                 <div class="invoice_inner">
-                                    <div class="row">
-                                       <div class="col-md-4">
-                                          <div class="full invoice_blog padding_infor_info padding-bottom_0">
-                                             <h4>From</h4>
-                                             <p><strong>Pluto Admin</strong><br>  
-                                                427 Schoen Circles Suite 124<br> 
-                                                Melbourne Australia<br>    
-                                                <strong>Phone : </strong><a href="tel:9876543210">9876 543 210</a><br>  
-                                                <strong>Email : </strong><a href="mailto:yourmail@gmail.com">Yourmail@gmail.com</a>
-                                             </p>
-                                          </div>
+                                 <div class="invoice_inner"> 
+                                    <div class="row m-3">
+                                        <div class="col-12 d-flex justify-content-between">
+                                            <img width="100" src="/assets/images/logo/jmis_logo-bg.png" alt="#" />
+                                            <p class="text-center mt"> <strong class="text-center"> JITEGEMEE  HIGH  SCHOOL </strong><br/>Student Finance Detail( Reg No: {{ student.index_no }})</p>
+                                            <h6 class="text-center mt-3">Cretated At<br/>{{this.to_date}}</h6>
+                                        </div>
+                                       <div class="col-md-6">
+                                          
                                        </div>
-                                       <div class="col-md-4">
+                                       <div class="col-md-6">
                                           <div class="full invoice_blog padding_infor_info padding-bottom_0">
-                                             <h4>To</h4>
-                                             <p><strong>David Roman</strong><br>  
-                                                427 Schoen Circles Suite 124<br> 
-                                                Melbourne Australia<br>    
-                                                <strong>Phone : </strong><a href="tel:9876543210">9876 543 210</a><br>  
-                                                <strong>Email : </strong><a href="mailto:yourmail@gmail.com">Yourmail@gmail.com</a>
-                                             </p>
-                                          </div>
-                                       </div>
-                                       <div class="col-md-4">
-                                          <div class="full invoice_blog padding_infor_info padding-bottom_0">
-                                             <h4>Invoice No - #111457 </h4>
-                                             <p><strong>Order ID : </strong>5b6R9C<br> 
-                                                <strong>Payment Due : </strong>July/18/2018<br> 
-                                                <strong>Account : </strong>254-55847
-                                             </p>
+                                             <h4>Balance (TZS): {{balance}}</h4>
                                           </div>
                                        </div>
                                     </div>
                                  </div>
                             </div>
                             <div class="full padding_infor_info">
-                                <div class="table_row">
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                            <th width="200px">Qty</th>
-                                            <th>Product</th>
-                                            <th>Serial #</th>
-                                            <th width="600px !important">Description</th>
-                                            <th>Subtotal</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                            <td>1</td>
-                                            <td>Product One</td>
-                                            <td>005-475-321</td>
-                                            <td>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</td>
-                                            <td>$20.00</td>
-                                            </tr>
-                                            <tr>
-                                            <td>2</td>
-                                            <td>Product Two</td>
-                                            <td>015-475-321</td>
-                                            <td>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</td>
-                                            <td>$25.00</td>
-                                            </tr>
-                                            <tr>
-                                            <td>3</td>
-                                            <td>Product Three</td>
-                                            <td>025-475-321</td>
-                                            <td>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</td>
-                                            <td>$20.00</td>
-                                            </tr>
-                                            <tr>
-                                            <td>4</td>
-                                            <td>Product Four</td>
-                                            <td>035-475-321</td>
-                                            <td>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</td>
-                                            <td>$15.00</td>
-                                            </tr>
-                                            <tr>
-                                            <td>5</td>
-                                            <td>Product Five</td>
-                                            <td>045-475-321</td>
-                                            <td>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</td>
-                                            <td>$25.00</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <p class="text-center p-head">Payments for Accademic Year {{ accademic_year }}</p>
+                                <div v-if="this.finance_loading" class="container mt-5 mb-5">
+                                    <div class="row">
+                                    <div class="span2"></div>  
+                                    <div class="span4">
+                                        <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                                    </div>
+                                    <div class="span4"></div>
+                                    </div>
                                 </div>
+                                <div v-if="!this.finance_loading" class="table_row">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                <th width="">Fee Type</th>
+                                                <th>Amount</th>
+                                                <th>Paid</th>
+                                                <th width="">Remains</th>
+                                                <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="feepay in feepays" :key="feepay.id">
+                                                    <td width="">{{feepay.fee}}</td>
+                                                    <td>{{ feepay.amount }}</td>
+                                                    <td>{{ feepay.paid_amount }}</td>
+                                                    <td width="">{{ feepay.amount - feepay.paid_amount }}</td>
+                                                    <td v-if="feepay.amount - feepay.paid_amount == 0">Nil</td>
+                                                    <td v-else>Not yet</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
+                                
+                            </div>
+                            </div>
+                            <div class="float-right">
+                                <button v-on:click="exportFinanceInfo" class="btn btn-dark form-control"><i class="fa fa-file-pdf-o"> </i> Export PDF</button>
                             </div>
                         </div>
                     </div>
@@ -270,17 +250,8 @@
                                 </div>
                             </div>
                             <div class="full progress_bar_inner m-3">
-                                <div class="d-flex justify-content-left">
-                                    <div class="">
-                                        <img src="/assets/images/layout_img/user.png" style="width: 130px; height: 140px"
-                                            alt="" />
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-capitalize">Index Number: </p>
-                                        <p class="text-capitalize">Name: </p>
-                                        <p class="text-capitalize">Admmited Year: </p>
-                                        <p class="text-capitalize">Status: </p>
-                                    </div>
+                                <div class="d-flex justify-content-center">
+                                    <h5 class="text-danger m-5">No Results found</h5>
                                 </div>
                             </div>
                         </div>
@@ -300,16 +271,32 @@
                                 </div>
                             </div>
                             <div class="full progress_bar_inner m-3">
-                                <div class="d-flex justify-content-left">
-                                    <div class="">
-                                        <img src="/assets/images/layout_img/user.png" style="width: 130px; height: 140px"
-                                            alt="" />
+                                <div class="d-flex justify-content-center">
+                                    <h5 class="text-danger m-5">No Attendance data found</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end attendance-->
+
+                <!--student attendance-->
+                <div class="row column4 graph">
+                    <div class="col-sm-12">
+                        <div class="white_shd full margin_bottom_30">
+                            <div class="full graph_head">
+                                <div class="">
+                                    <div class="heading1 margin_0">
+                                        <h2>More Actions</h2>
                                     </div>
-                                    <div class="ml-3">
-                                        <p class="text-capitalize">Index Number: </p>
-                                        <p class="text-capitalize">Name:</p>
-                                        <p class="text-capitalize">Admmited Year: </p>
-                                        <p class="text-capitalize">Status: </p>
+                                </div>
+                            </div>
+                            <div class="full progress_bar_inner m-3">
+                                <div class="d-flex justify-content-center">
+                                    <div class="m-3">
+                                        <button class="btn btn-success ml-1">Edit Student</button>
+                                        <button class="btn btn-success ml-1">Edit Parent</button>
+                                        <button class="btn btn-danger ml-1">Transfer Out</button>
                                     </div>
                                 </div>
                             </div>
@@ -347,16 +334,21 @@
         parent_loading:true,
         admission_loading:true,
         print_personal_info:false,
+        finance_loading:true,
         ////basic
         user_id:"",
         role_id:"",
         accademic_year: new Date().getFullYear(),
-        student:{},
-        admission:{},
-        parent:{},
         search_index_no:"",
         index_no_erro:"",
         to_date:"",
+        ///student-parent
+        student:{},
+        admission:{},
+        parent:{},
+        ////finance
+        feepays:[],
+        balance:0
       };
     },
     methods: {
@@ -380,6 +372,7 @@
           ///call function for more details
           this.admissionInfo()
           this.parentInfo()
+          this.financeInfo()
 
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, '0');
@@ -410,17 +403,35 @@
         var reg_no = this.student.index_no
 
         const doc = new jspdf()
-        const html = document.getElementById('personal_info').innerHTML
+        const html = document.getElementById('personal_info')
 
         doc.html(html, {
             callback: function(doc) {
                 // Save the PDF
                 doc.save(reg_no+"_persoanl_info.pdf");
             },
-            x: 15,
-            y: 15,
-            width: 170, //target width in the PDF document
-            windowWidth: 650 //window width in CSS pixels
+            x: 5,
+            y: 10,
+            width: 200, //target width in the PDF document
+            windowWidth: 900 //window width in CSS pixels
+        });
+
+    },
+    exportFinanceInfo(){
+        var reg_no = this.student.index_no
+
+        const doc = new jspdf()
+        const html = document.getElementById('finance_info')
+
+        doc.html(html, {
+            callback: function(doc) {
+                // Save the PDF
+                doc.save(reg_no+"_finance_info.pdf");
+            },
+            x: 5,
+            y: 10,
+            width: 200, //target width in the PDF document
+            windowWidth: 900 //window width in CSS pixels
         });
 
     },
@@ -443,6 +454,20 @@
             this.parent = response.data;
             this.parent_loading = false;
         }
+        })
+
+    },
+    financeInfo(){
+        var student_id = this.student.id
+        var year = this.accademic_year
+
+        axios.post(this.$store.state.api_url + "/finance-info",{student_id,year}).then((response) => {
+        //console.log(response.data);
+            if(response.data != null){
+                this.feepays = response.data.feepays;
+                this.balance = response.data.balance;
+                this.finance_loading = false;
+            }
         })
 
     },

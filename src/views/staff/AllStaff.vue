@@ -43,17 +43,21 @@
                       </div>
                       <div class="col-sm-12 col-md-6">
                         <div class="form-group">
-                          <label for="initial">Name Initial</label>
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="initial"
+                          <label for="roles">Initial*</label>
+                          <select
                             v-model="this.form.initial"
-                            placeholder="Dr/Col/Maj/Tr/Prof/Mr/Mrs  ect"
-                            aria-describedby="emailHelp"
+                            id="initial"
+                            class="form-control"
                             required
-                          />
+                          >
+                            <option class="" value="Dr">Dr</option>
+                            <option class="" value="Prof">Prof</option>
+                            <option class="" value="Mr">Mr</option>
+                            <option class="" value="Ms">Ms</option>
+                            <option class="" value="Tr">Tr</option>
+                          </select>
                         </div>
+                        
                         <div class="form-group">
                           <label for="first_name">First Name*</label>
                           <input
@@ -99,14 +103,8 @@
                             id="gender"
                             required
                           >
-                            <option
-                              class="text-capitalize"
-                              v-for="gender in genders"
-                              :key="gender.id"
-                              :value="gender.id"
-                            >
-                              {{ gender.gender }}
-                            </option>
+                            <option class="text-capitalize" value="1">Male</option>
+                            <option class="text-capitalize" value="2">Female</option>
                           </select>
                         </div>
                       </div>
@@ -120,6 +118,8 @@
                             id="phone"
                             v-model="this.form.phone"
                             placeholder="0768448525"
+                            minlength="10"
+                            maxlength="10"
                             required
                           />
                         </div>
@@ -137,7 +137,7 @@
                         </div>
 
                         <div class="form-group">
-                          <label for="home_address">Home address*</label>
+                          <label for="home_address">Residence*</label>
                           <input
                             type="text"
                             class="form-control"
@@ -158,10 +158,12 @@
                             required
                           >
                             <option
+                             
                               class="text-capitalize"
                               v-for="role in roles"
                               :key="role.id"
                               :value="role.id"
+                             
                             >
                               {{ role.role }}
                             </option>
@@ -235,7 +237,7 @@
             <div class="full progress_bar_inner">
               <div class="row">
                 <div class="col-md-12">
-                  <div class="inbox-head">
+                  <!--div  class="inbox-head">
                     <h3>found (10)</h3>
                     <form action="#" class="pull-right position search_inbox">
                       <div class="input-append">
@@ -249,16 +251,25 @@
                         </button>
                       </div>
                     </form>
+                  </div-->
+                  <div v-if="this.loading" class="container mt-5 mb-5">
+                    <div class="row">
+                      <div class="span2"></div>
+                      <div class="span4">
+                        <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                      </div>
+                      <div class="span4"></div>
+                    </div>
                   </div>
                   <div class="full price_table padding_infor_info">
-                  <div class="row">
+                  <div v-if="!this.loading" class="row">
                      <!-- column contact --> 
                      <div v-for="staff in staffs" :key="staff.id" class="col-lg-4 col-md-6 col-sm-6 col-xs-12 profile_details margin_bottom_30">
                           <div class="contact_blog">
                             <h4 class="brief">{{ staff.department }}</h4>
                             <div class="contact_inner">
                                 <div class="left">
-                                  <h3>{{ staff.initial+" "+staff.first_name+" "+staff.last_name }}</h3>
+                                  <h3 class="text-capitalize">{{ staff.initial+" "+staff.first_name+" "+staff.last_name }}</h3>
                                 </div>
                                 <div class="right">
                                   <div class="profile_contacts">
@@ -276,12 +287,12 @@
                                       </p>
                                   </div>
                                   <div class="right_button">
-                                      <button type="button" class="btn btn-success btn-xs mr-2"> <i class="fa fa-user">
-                                      </i> <i class="fa fa-comments-o"></i> 
+                                      <button v-if="form.role_id == 4" type="button" class="btn btn-success btn-xs mr-2"> <i class="fa fa-user">
+                                      </i> <i class="fa fa-edit"></i> 
                                       </button>
-                                      <button type="button" class="btn btn-primary btn-xs">
+                                      <router-link to="/profile" v-if="staff.id == form.user_id" type="button" class="btn btn-primary btn-xs">
                                       <i class="fa fa-user"> </i> View Profile
-                                      </button>
+                                      </router-link>
                                   </div>
                                 </div>
                             </div>
@@ -315,6 +326,7 @@ export default {
   data() {
     return {
       add_staff: true,
+      loading:true,
       roles: [],
       genders:[],
       departments: [],
@@ -341,62 +353,55 @@ export default {
       this.allStaff();
       this.add_staff = !this.add_staff;
     },
-    userRole() {
-      axios.get(this.$store.state.api_url + "/roles").then((response) => {
+    async userRole() {
+      var role_id = this.form.role_id
+      var response = await axios.get(this.$store.state.api_url + "/roles")
         console.log(response.data);
-        this.roles = response.data;
-      });
+          this.roles = response.data.filter((i) => i.id != 1)
+        if(role_id != 4){
+          this.roles = this.roles.filter((i) => i.id != 4) 
+        }
+     
     },
-    getGender() {
-      axios.get(this.$store.state.api_url + "/genders").then((response) => {
+    async getGender() {
+      var response = await axios.get(this.$store.state.api_url + "/genders")
         console.log(response.data);
         this.genders = response.data;
-      });
+      
     },
-    allDepartment() {
-      axios.get(this.$store.state.api_url + "/departments").then((response) => {
+    async allDepartment() {
+      var response = await axios.get(this.$store.state.api_url + "/departments")
         console.log(response.data);
         this.departments = response.data;
-      });
+      
     },
-    allStaff() {
-      axios.get(this.$store.state.api_url + "/staffs").then((response) => {
-        console.log(response.data);
+    async allStaff() {
+      var response = await axios.get(this.$store.state.api_url + "/staffs")
+        //console.log(response.data);
         this.staffs = response.data;
-      });
+        this.loading = false
     },
-    addNewStaff() {
+    async addNewStaff() {
       this.errors = [];
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/create-staff", this.form)
-        .then((response) => {
+        .catch((errors) => {
+          
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
-            alert(response.data.message);
+            //alert(response.data.message);
+            var message = response.data.message;
+            this.$toast.success(message,{duration: 7000,dismissible: true,})
+            window.location.reload();
           } else {
             this.errors = response.data.message;
           }
-        })
-        .catch((errors) => {
-          this.errors = "Network or Server Errors";
-        });
+     
+        
     },
-    imageProcess(e) {
-      let file = e.target.files[0];
-      let reader = new FileReader();
-
-      alert("well it chabged");
-
-      if (file["size"] < 1111775) {
-        reader.onloadend = (file) => {
-          console.log("RESULT", reader.result);
-          //this.form.photo = reader.result;
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert("You have Choose The file more than 2MB");
-        //swal("Congrats!", ", Your account is created!", "success");
-      }
-    },
+    
     emptyForm() {
       (this.form.username = ""),
         (this.form.first_name = ""),
@@ -419,11 +424,12 @@ export default {
     },
   },
   created() {
+    this.isAuth();
     this.userRole();
     this.getGender();
     this.allStaff();
     this.allDepartment();
-    this.isAuth();
+    
   },
 };
 </script>

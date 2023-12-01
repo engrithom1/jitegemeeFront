@@ -201,14 +201,14 @@ export default {
       user_id:"",
       role_id:"",
       ////dashbord info
-      balances:"23,000,000",
-      debits:"2,356,000",
-      paids:"780,000",
-      attendance:45,
-      students:"1200",
-      subjects:"13",
-      teachers:"75",
-      staffs:"120"
+      balances:"000,000",
+      debits:"000,000",
+      paids:"000,000",
+      attendance:0,
+      students:"0000",
+      subjects:"00",
+      teachers:"00",
+      staffs:"00"
     }
   },
   methods:{

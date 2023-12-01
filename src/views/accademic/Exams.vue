@@ -183,12 +183,15 @@ export default {
     };
   },
   methods: {
-    allExams() {
-      axios.get(this.$store.state.api_url + "/exams").then((response) => {
+    async allExams() {
+      var response = await axios.get(this.$store.state.api_url + "/exams").catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+      });
         //console.log(response.data);
         this.exams = response.data;
         this.loading = false
-      });
+  
     },
     getEdit(id, examname) {
       this.edit_errors = [];
@@ -196,11 +199,14 @@ export default {
       this.og_examname = examname;
       this.edit_examname = examname;
     },
-    addNewExam() {
+    async addNewExam() {
       this.errors = [];
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/create-exam", this.form)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.exams = response.data.exams;
             var message = response.data.message;
@@ -209,13 +215,10 @@ export default {
             this.errors = response.data.message;
             
           }
-        })
-        .catch((errors) => {
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+     
+       
     },
-    updateExam() {
+    async updateExam() {
       this.edit_errors = [];
       var data = {
         examname: this.edit_examname,
@@ -224,9 +227,12 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/update-exam", data)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.exams = response.data.exams;
            
@@ -235,13 +241,10 @@ export default {
           } else {
             this.edit_errors = [response.data.message];
           }
-        })
-        .catch((errors) => {
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+     
+       
     },
-    deleteExam(id, exam) {
+    async deleteExam(id, exam) {
       this.errors = [];
       var data = {
         exam_id: id,
@@ -249,9 +252,12 @@ export default {
         user_id: this.form.user_id,
         role_id: this.form.role_id,
       };
-      axios
+      var response = await axios
         .post(this.$store.state.api_url + "/delete-exam", data)
-        .then((response) => {
+        .catch((errors) => {
+          var message = "Network or Server Errors";
+          this.$toast.error(message,{duration: 7000,dismissible: true,})
+        });
           if (response.data.success) {
             this.exams = response.data.exams;
             var message = response.data.message;
@@ -259,12 +265,7 @@ export default {
           } else {
             var message = response.data.message;
             this.$toast.error(message,{duration: 7000,dismissible: true,}) 
-          }
-        })
-        .catch((errors) => {
-          var message = "Network or Server Errors";
-          this.$toast.error(message,{duration: 7000,dismissible: true,})
-        });
+          } 
     },
     isAuth() {
       var user = localStorage.getItem("user");
