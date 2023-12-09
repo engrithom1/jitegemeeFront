@@ -384,10 +384,10 @@ export default {
           this.loading = false
           //console.log(response.data.filter((i) => i.id > 1));
       },
-    async allSubjects() {
-      var response = await axios.get(this.$store.state.api_url + "/subjects")
+    async olevelSubjects() {
+      var response = await axios.get(this.$store.state.api_url + "/olevel-subjects")
         //console.log(response.data);
-        this.subjects = response.data.filter((i) => i.level_id === 7);
+        this.subjects = response.data
     },
     async allFees() {
       var response = await axios.get(this.$store.state.api_url + "/fees")
@@ -578,7 +578,7 @@ export default {
     this.allLevel();
     this.allStaff();
     this.allFees();
-    this.allSubjects();
+    this.olevelSubjects();
    
     /*axios.defaults.headers.common["Authorization"] =
       "Bearer " + localStorage.getItem("user_token");*/

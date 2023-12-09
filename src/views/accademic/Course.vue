@@ -30,8 +30,10 @@
                       type="text"
                       class="form-control"
                       v-model="this.form.coursename"
-                      placeholder="course name"
+                      placeholder="PCM"
                       aria-describedby="emailHelp"
+                      minlength="3"
+                      maxlength="3"
                     />
                   </div>
                  
@@ -40,7 +42,7 @@
                   <div class="form-grioup">
                     <label for="csubjects" class="mb-3">Select Subjects*</label>
                     <div class="row">
-                    <div v-for="subz in subjects" :key="subz.id" class="col-sm-6 col-md-6">
+                    <div v-for="subz in subjects" :key="subz.id" class="col-md-12">
                     <input :id="subz.id" :subject_name="subz.subject" :value="subz.id" v-model="this.form.s_subjects" class="mr-2" type="checkbox">
                     <label :for="subz.id">{{ subz.subject }}</label>
                     </div>
@@ -165,7 +167,9 @@
                   type="text"
                   class="form-control"
                   v-model="this.edit_coursename"
-                  placeholder="cbg"
+                  placeholder="PCM"
+                  minlength="3"
+                  maxlength="3"
                   aria-describedby="emailHelp"
                 />
               </div>
@@ -234,10 +238,10 @@
           this.loading = false;
 
       },
-      async allSubjects() {
-        var response = await axios.get(this.$store.state.api_url + "/subjects")
+      async alevelSubjects() {
+        var response = await axios.get(this.$store.state.api_url + "/alevel-subjects")
           //console.log(response.data);
-          this.subjects = response.data.filter((i) => i.level_id === 8);
+          this.subjects = response.data
       },
       getEdit(id, coursename, subjects) {
         this.edit_errors = [];
@@ -373,7 +377,7 @@
     },
     created() {
       this.allCourses();
-      this.allSubjects();
+      this.alevelSubjects();
       this.isAuth();
       /*axios.defaults.headers.common["Authorization"] =
         "Bearer " + localStorage.getItem("user_token");*/
