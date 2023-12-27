@@ -598,7 +598,7 @@ export default {
         former_school: "",
         home_address: "",
         nationality: "",
-        accademic_year: "",
+        accademic_year: "2024",
         regist_year: new Date().getFullYear(),
         birth_date: "",
         behavior: "",
@@ -791,7 +791,9 @@ export default {
               this.$toast.success(message,{duration: 7000,dismissible: true,})
               window.location.reload();
             } else {
-              this.errors = [response.data.message];
+              this.errors = response.data.message;
+              var message = "Fill your form correctly";
+              this.$toast.error(message,{duration: 7000,dismissible: true,})
             }
           
       }

@@ -1,3 +1,4 @@
+
 <template>
   <div class="midde_cont">
     <div class="container-fluid">
@@ -22,7 +23,7 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="inbox-head">
-                    <h3>found (4810)</h3>
+                    <h3>found ({{ this.og_students.length }})</h3>
                     <form action="#" class="pull-right position search_inbox">
                       <div class="input-append">
                         <input
@@ -39,83 +40,79 @@
                   <div class="inbox-body">
                     <div class="mail-option">
                       <div class="btn-group hidden-phone">
-                        <select class="form-control" name="" id="">
-                          <option value="">All Level</option>
-                          <option value="">Form I</option>
-                          <option value="">Form II</option>
-                          <option value="">Form III</option>
-                          <option value="">Form IV</option>
-                          <hr />
-                          <option value="">Form V</option>
-                          <option value="">Form VI</option>
+                        <select class="form-control" v-on:change="levelSelected()" v-model="this.level_id">
+                          <option :value="0" selected>All Level</option>
+                          <option
+                            v-for="level in levels"
+                            :key="level.id"
+                            :value="level.id">
+                            {{ level.level }}
+                          </option>
                         </select>
                       </div>
                       <div class="btn-group">
-                        <select class="form-control" name="" id="">
-                          <option value="">All Class</option>
-                          <option value="">Class IA1</option>
-                          <option value="">Class IB2</option>
-                          <option value="">Class IC3</option>
-                          <option value="">Class IIA1</option>
+                        <select class="form-control" v-on:change="classSelected()" v-model="this.class_id">
+                          <option :value="0" selected>All Classes</option>
+                          <option
+                              v-for="clas in clasz"
+                              :key="clas.id"
+                              :value="clas.id">
+                              {{ clas.classname }}
+                          </option>
                         </select>
                       </div>
                       <ul class="unstyled inbox-pagination mb-3">
-                        <li><span>1-50 of 234</span></li>
-                        <li>
-                          <a class="np-btn" href="#"
-                            ><i class="fa fa-angle-left pagination-left"></i
-                          ></a>
+                        <li><span>{{ this.students.length }} of {{ this.og_students.length }}</span></li>
+                        <!--li>
+                          <a class="np-btn" href="#">
+                            <i class="fa fa-angle-left pagination-left"></i>
+                          </a>
                         </li>
                         <li>
-                          <a class="np-btn" href="#"
-                            ><i class="fa fa-angle-right pagination-right"></i
-                          ></a>
-                        </li>
+                          <a class="np-btn" href="#">
+                            <i class="fa fa-angle-right pagination-right"></i>
+                          </a>
+                        </li-->
                       </ul>
-                      <div class="table-responsive-md w-100">
+                      <div v-if="this.loading" class="container mt-5 mb-5">
+                          <div class="row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-6">
+                              <img class="center-block" width="500" src="/assets/images/loading/cupertino.gif" alt="#" />
+                            </div>
+                            <div class="col-sm-3"></div>
+                          </div>
+                      </div>
+
+                      <div v-if="!this.loading" class="table-responsive-md w-100">
+                        
                         <table class="table table-hover">
                           <thead>
                             <th><b>Index Number</b></th>
                             <th><b>Full Name</b></th>
+                            <th><b>Class</b></th>
+                            <th><b>Gender</b></th>
                             <th><b>Action</b></th>
                           </thead>
                           <tbody>
-                            <tr class="">
-                              <td class="">23-3489</td>
-                              <td class="">Sambokile kandenga kindeki</td>
+                            <div v-if="students.length == 0">
+                              <h4>No Student Found</h4>
+                            </div>
+                            <tr class="" v-for="student in students">
+                              <td class="">{{ student.index_no }}</td>
+                              <td class="text-uppercase">{{ student.first_name+' '+student.middle_name+' '+student.last_name}}</td>
+                              <td class="">{{ student.classname }}</td>
+                              <td class="text-uppercase">{{ student.gender}}</td>
                               <td class="">
-                                <button class="btn btn-primary btn-table mr-1">
+                                <button class="btn btn-primary btn-table btn-sm mr-1">
                                   <i class="fa fa-edit"></i>
                                 </button>
-                                <button class="btn btn-info btn-table">
-                                  <i class="fa fa-eye"></i>
+                                <button class="btn btn-info btn-table btn-sm">
+                                  <i class="fa fa-user"></i>
                                 </button>
                               </td>
                             </tr>
-                            <tr class="">
-                              <td class="">24-1232</td>
-                              <td class="">John sabas komba</td>
-                              <td class="">
-                                <button class="btn btn-primary mr-1">
-                                  <i class="fa fa-edit"></i>
-                                </button>
-                                <button class="btn btn-info">
-                                  <i class="fa fa-eye"></i>
-                                </button>
-                              </td>
-                            </tr>
-                            <tr class="">
-                              <td class="">22-1232</td>
-                              <td class="">Nawene bob Gingo</td>
-                              <td class="">
-                                <button class="btn btn-primary mr-1">
-                                  <i class="fa fa-edit"></i>
-                                </button>
-                                <button class="btn btn-info">
-                                  <i class="fa fa-eye"></i>
-                                </button>
-                              </td>
-                            </tr>
+                  
                           </tbody>
                         </table>
                       </div>
@@ -137,3 +134,101 @@
     </div>
   </div>
 </template>
+
+<script>
+  import axios from "axios";
+  export default {
+    data() {
+      return{
+
+        levels: [],
+        clasz:[],
+        academic_year: new Date().getFullYear(),
+        user_id:"",
+        role_id:"",
+        class_id:0,
+        level_id:0,
+        search_class:true,
+        loading:true,
+        allclass:[],
+        og_students:[],
+        students:[]
+      }
+    },
+    methods:{
+      isAuth() {
+      var user = localStorage.getItem("user");
+      var token = localStorage.getItem("user_token");
+      if (user && token) {
+        user = JSON.parse(user);
+        this.user_id = user.id;
+        this.role_id = user.role_id;
+      }
+      },
+      refleshPage(){
+      window.location.reload();
+      }, 
+      async allLevel() {
+      var response = await axios.get(this.$store.state.api_url + "/levels")
+        //console.log(response.data);
+      this.levels = response.data;
+    
+    },
+      async allStudents() {
+      var response = await axios.get(this.$store.state.api_url + "/all-students")
+      console.log(response.data);
+      this.og_students = response.data;
+      if(response.data.length > 50){
+        this.students = response.data.slice(0,50)
+      }else{
+        this.students = response.data;
+      }
+      this.loading = false
+    
+    },
+    async allClaszs() {
+      var response = await axios.get(this.$store.state.api_url + "/class")
+        //console.log(response.data);
+        this.allclass = response.data;
+    },
+    levelSelected() {
+      var og_students = this.og_students;
+      var allcls = this.allclass;
+      var level_id = this.level_id;
+      //alert(level_id)
+      if(level_id == 0){
+        this.students = og_students
+        this.clasz = []
+        this.class_id = 0
+      }else{
+        this.clasz = allcls.filter((i) => i.level_id == level_id);
+        this.students = og_students.filter((i) => i.level_id == level_id);
+      }
+    },
+    classSelected(){
+      //this.search_class = false;
+      var og_students = this.og_students
+      var level_id = this.level_id;
+      var class_id = this.class_id
+      
+      if(class_id == 0){
+        this.students = og_students.filter((i) => i.level_id == level_id);
+      }else{
+        var students = og_students.filter((i) => i.level_id == level_id);
+
+        this.students = students.filter((i) => i.classroom_id == class_id);
+      }
+    },
+
+    },
+      computed:{
+    },
+    created() {
+    this.isAuth();
+    this.allClaszs();    
+    this.allLevel();
+    this.allStudents();
+    
+  },
+  }
+</script>

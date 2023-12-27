@@ -334,17 +334,10 @@ export default {
     },
     logout() {
       this.$store.dispatch("logOut", { id: this.user.id });
-    },
-    preventBack(){
-      window.addEventListener('beforeunload', function (e) {
-      e.preventDefault();
-      e.returnValue = '';
-      });
     }
   },
   created() {
     this.isLoged();
-    this.preventBack();
     axios.defaults.headers.common["Authorization"] =
       "Bearer " + localStorage.getItem("user_token");
   },

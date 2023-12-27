@@ -139,7 +139,7 @@
                                       <div class="form-group">
                                           <label for="pgender">Accademic Year*</label>
                                           <input :disabled="this.role_id != 4 || this.department_id != 1" type="number" maxlength="4" minlength="4" class="form-control"
-                                              v-model="this.accademic_year" aria-describedby="emailHelp" required />
+                                              v-model="this.student.accademic_year" aria-describedby="emailHelp" required />
                                       </div>
 
                                       <div class="form-group">
@@ -557,7 +557,7 @@ export default {
         var role_id = this.role_id;
         var level_id = this.level_id;
         var admission_id = this.admission_id;
-        var year = this.accademic_year
+        var year = this.student.accademic_year
 
         var fees = this.fees
       var feef = []
