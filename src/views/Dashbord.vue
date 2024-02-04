@@ -225,22 +225,72 @@ export default {
     var year = this.academic_year
 
     axios.post(this.$store.state.api_url + "/dashbord-datas",{year}).then((response) => {
-      this.students = response.data.students;
-      this.subjects = response.data.subjects;
-      this.teachers = response.data.teachers;
-      this.staffs = response.data.staffs;
-      this.balances = new Intl.NumberFormat().format(response.data.balances);
+      //this.students = response.data.students;
+      //this.subjects = response.data.subjects;
+      //this.teachers = response.data.teachers;
+      //this.staffs = response.data.staffs;
+      //this.balances = new Intl.NumberFormat().format(response.data.balances);
       this.paids = new Intl.NumberFormat().format(response.data.paids);
       this.debits = new Intl.NumberFormat().format(response.data.debits);
       this.attendance = response.data.attendance;
     });
+  },
+  async dashBalances(){
+      var response = await axios.get(this.$store.state.api_url + "/dash-balances")
+        //console.log(response.data);
+        this.balances = new Intl.NumberFormat().format(response.data);
+  },
+  async dashStudents(){
+      var response = await axios.get(this.$store.state.api_url + "/dash-students")
+        //console.log(response.data);
+        this.students = response.data;
+  },
+  async dashTeachers(){
+      var response = await axios.get(this.$store.state.api_url + "/dash-teachers")
+        //console.log(response.data);
+        this.teachers = response.data;
+  },
+  async dashStaffs(){
+      var response = await axios.get(this.$store.state.api_url + "/dash-staffs")
+        //console.log(response.data);
+        this.staffs = response.data;
+  },
+  async dashSubjects(){
+      var response = await axios.get(this.$store.state.api_url + "/dash-subjects")
+        //console.log(response.data);
+        this.subjects = response.data;
+  },
+  async dashPaids(){
+      var year = this.academic_year
+      var response = await axios.post(this.$store.state.api_url + "/dash-paids",{year})
+        //console.log(response.data);
+        this.paids = new Intl.NumberFormat().format(response.data);
+  },
+  async dashDebits(){
+      var year = this.academic_year
+      var response = await axios.post(this.$store.state.api_url + "/dash-debits",{year})
+        //console.log(response.data);
+        this.debits = new Intl.NumberFormat().format(response.data);
+  },
+  async dashAttendance(){
+      var year = this.academic_year
+      var response = await axios.post(this.$store.state.api_url + "/dash-attendance",{year})
+        //console.log(response.data);
+        this.debits = response.data;
   },
 },
     computed:{
   },
   created() {
   this.isAuth();
-  this.dashbordData();
+  this.dashBalances();
+  this.dashStudents();
+  this.dashAttendance();
+  this.dashTeachers();
+  this.dashStaffs();
+  this.dashSubjects();
+  this.dashPaids();
+  this.dashDebits();
 },
 }
 </script>

@@ -3,8 +3,8 @@ import axios from 'axios'
 
 export default createStore({
   state: {
-    api_url:"http://localhost:8000/api",
-    //api_url:"https://jitegemeesec.ac.tz/jmisback/api",
+    //api_url:"http://localhost:8000/api",
+    api_url:"https://jitegemeesec.ac.tz/jmisback/api",
     user:{},
     errors:"",
   },

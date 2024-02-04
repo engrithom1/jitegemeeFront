@@ -37,6 +37,7 @@
                       </div>
                     </form>
                   </div>
+                 
                   <div class="inbox-body">
                     <div class="mail-option">
                       <div class="btn-group hidden-phone">
@@ -61,6 +62,9 @@
                           </option>
                         </select>
                       </div>
+                      <div class="btn-group">
+                        <button v-on:click="this.exportStudentData()" class="btn btn-default">Export Pdf</button>
+                      </div>
                       <ul class="unstyled inbox-pagination mb-3">
                         <li><span>{{ this.students.length }} of {{ this.og_students.length }}</span></li>
                         <!--li>
@@ -83,6 +87,8 @@
                             <div class="col-sm-3"></div>
                           </div>
                       </div>
+
+                     
 
                       <div v-if="!this.loading" class="table-responsive-md w-100">
                         
@@ -118,6 +124,39 @@
                       </div>
                     </div>
                   </div>
+                   <!---print start-->
+                   <div v-show="this.show_first" class="row" id="print_students">
+                    <div class="col-12 d-flex justify-content-between mb-3">
+                        <img width="100" src="/assets/images/logo/jmis_logo-bg.png" alt="#" />
+                        <p class="text-center mt-3"> <strong class="text-center"> JITEGEMEE  HIGH  SCHOOL </strong><br/>Students List</p>
+                        <h6 class="text-center mt-3 p-2">Cretated At<br/>{{this.to_date}}</h6>
+                    </div>
+                    <div class="table-responsive-md col-12 w-100">
+                        
+                        <table class="table table-hover">
+                          <thead>
+                            <th><b>Index Number</b></th>
+                            <th><b>Full Name</b></th>
+                            <th><b>Class</b></th>
+                            <th><b>Gender</b></th>
+                           
+                          </thead>
+                          <tbody>
+                            <div v-if="students.length == 0">
+                              <h4>No Student Found</h4>
+                            </div>
+                            <tr class="" v-for="student in students">
+                              <td class="">{{ student.index_no }}</td>
+                              <td class="text-uppercase">{{ student.first_name+' '+student.middle_name+' '+student.last_name}}</td>
+                              <td class="">{{ student.classname }}</td>
+                              <td class="text-uppercase">{{ student.gender}}</td>
+                            </tr>  
+                  
+                          </tbody>
+                        </table>
+                      </div>
+                  </div>
+                  <!--print end-->
                 </div>
               </div>
             </div>
@@ -137,6 +176,7 @@
 
 <script>
   import axios from "axios";
+  import jspdf from "jspdf"
   export default {
     data() {
       return{
@@ -152,7 +192,9 @@
         loading:true,
         allclass:[],
         og_students:[],
-        students:[]
+        students:[],
+        to_date:"",
+        show_first:false
       }
     },
     methods:{
@@ -174,7 +216,37 @@
       this.levels = response.data;
     
     },
+    async exportStudentData(){
+
+      this.show_first = true;
+       
+        const doc = new jspdf()
+        const html = document.getElementById('print_students')
+
+       await doc.html(html, {
+            callback: function(doc) {
+                // Save the PDF
+                doc.save("student_list.pdf");
+            },
+            x: 5,
+            y: 10,
+            width: 200, //target width in the PDF document
+            windowWidth: 900 //window width in CSS pixels
+        });
+
+        this.show_first = false;
+
+    },
       async allStudents() {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = dd + ' /' + mm + ' /' + yyyy;
+
+        this.to_date = today;
+
       var response = await axios.get(this.$store.state.api_url + "/all-students")
       console.log(response.data);
       this.og_students = response.data;
