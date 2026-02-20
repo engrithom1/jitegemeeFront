@@ -94,6 +94,7 @@
                         
                         <table class="table table-hover">
                           <thead>
+                            <th><b>No</b></th>
                             <th><b>Index Number</b></th>
                             <th><b>Full Name</b></th>
                             <th><b>Class</b></th>
@@ -104,7 +105,8 @@
                             <div v-if="students.length == 0">
                               <h4>No Student Found</h4>
                             </div>
-                            <tr class="" v-for="student in students">
+                            <tr class="" v-for="student,index in students">
+                              <td class="">{{ index+1 }}</td>
                               <td class="">{{ student.index_no }}</td>
                               <td class="text-uppercase">{{ student.first_name+' '+student.middle_name+' '+student.last_name}}</td>
                               <td class="">{{ student.classname }}</td>
@@ -124,6 +126,7 @@
                       </div>
                     </div>
                   </div>
+
                    <!---print start-->
                    <div v-show="this.show_first" class="row" id="print_students">
                     <div class="col-12 d-flex justify-content-between mb-3">
@@ -135,6 +138,7 @@
                         
                         <table class="table table-hover">
                           <thead>
+                            <th><b>No</b></th>
                             <th><b>Index Number</b></th>
                             <th><b>Full Name</b></th>
                             <th><b>Class</b></th>
@@ -145,7 +149,8 @@
                             <div v-if="students.length == 0">
                               <h4>No Student Found</h4>
                             </div>
-                            <tr class="" v-for="student in students">
+                            <tr class="" v-for="student,index in students">
+                              <td class="">{{ index+1 }}</td>
                               <td class="">{{ student.index_no }}</td>
                               <td class="text-uppercase">{{ student.first_name+' '+student.middle_name+' '+student.last_name}}</td>
                               <td class="">{{ student.classname }}</td>
@@ -157,6 +162,7 @@
                       </div>
                   </div>
                   <!--print end-->
+                  
                 </div>
               </div>
             </div>
@@ -176,7 +182,9 @@
 
 <script>
   import axios from "axios";
-  import jspdf from "jspdf"
+  import * as CryptoJS from 'crypto-js';
+  //import jspdf from "jspdf";
+  import html2pdf from "html2pdf.js";
   export default {
     data() {
       return{
@@ -199,8 +207,10 @@
     },
     methods:{
       isAuth() {
-      var user = localStorage.getItem("user");
-      var token = localStorage.getItem("user_token");
+      var user_cry = localStorage.getItem("rich") || "";
+      var token_cry = localStorage.getItem("rosh") || "";
+      var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+      var token = CryptoJS.AES.decrypt(token_cry, 'rosh').toString(CryptoJS.enc.Utf8) || null
       if (user && token) {
         user = JSON.parse(user);
         this.user_id = user.id;
@@ -219,11 +229,41 @@
     async exportStudentData(){
 
       this.show_first = true;
+
+      var level = ""
+      var clazz = ""
+
+      if(this.level_id == 0){
+         level = "all_Level"
+      }else{
+         level = "form"
+      }
+
+      if(this.class_id == 0){
+         clazz = "all_class"
+      }else{
+         clazz = this.allclass.find(x => x.id === this.class_id).classname
+      }
        
+      const html = document.getElementById('print_students')
+
+       await html2pdf(html, {
+				margin: 10,
+        pagebreak: { avoid: "tr", mode: "css", before: "#nextpage1" },
+  			filename: level+"_"+clazz+"_student_list.pdf",
+			});
+
+        this.show_first = false;
+
+    },
+    async not_in_use_exportStudentData(){
+
+      this.show_first = true;
+      
         const doc = new jspdf()
         const html = document.getElementById('print_students')
 
-       await doc.html(html, {
+      await doc.html(html, {
             callback: function(doc) {
                 // Save the PDF
                 doc.save("student_list.pdf");
@@ -236,7 +276,7 @@
 
         this.show_first = false;
 
-    },
+      },
       async allStudents() {
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, '0');
@@ -274,7 +314,9 @@
         this.class_id = 0
       }else{
         this.clasz = allcls.filter((i) => i.level_id == level_id);
-        this.students = og_students.filter((i) => i.level_id == level_id);
+        var bf_students = og_students.filter((i) => i.level_id == level_id);
+        //bf_students = bf_students.sort((a, b) => a.gender - b.gender);
+        this.students = bf_students.sort((a, b) => a.first_name > b.first_name ? 1 : -1);
       }
     },
     classSelected(){
@@ -288,7 +330,11 @@
       }else{
         var students = og_students.filter((i) => i.level_id == level_id);
 
-        this.students = students.filter((i) => i.classroom_id == class_id);
+        students = students.filter((i) => i.classroom_id == class_id);
+
+        //students = students.sort((a, b) => a.gender - b.gender);
+
+        this.students = students.sort((a, b) => a.first_name > b.first_name ? 1 : -1);
       }
     },
 

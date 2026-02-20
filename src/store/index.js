@@ -1,10 +1,13 @@
 import {createStore} from 'vuex'
 import axios from 'axios'
+import * as CryptoJS from 'crypto-js';
 
 export default createStore({
   state: {
+    api_url:"http://203.161.52.59/api/api",
+    //api_url:"https://back.jitegemeesec.ac.tz/api",
     //api_url:"http://localhost:8000/api",
-    api_url:"https://jitegemeesec.ac.tz/jmisback/api",
+    //api_url:"https://jitegemeesec.ac.tz/jmisback/api",
     user:{},
     errors:"",
   },
@@ -37,9 +40,12 @@ export default createStore({
         if(response.data.success) {
 
           commit('setUser',response.data.data.user)
-          localStorage.setItem('user',JSON.stringify(response.data.data.user))
-          localStorage.setItem('user_token',response.data.data.token)
-          window.location.replace('/');
+          //localStorage.setItem('user',JSON.stringify(response.data.data.user))
+          //localStorage.setItem('user_token',response.data.data.token)
+          localStorage.setItem('rich',CryptoJS.AES.encrypt(JSON.stringify(response.data.data.user), 'rich').toString())
+          localStorage.setItem('rosh',CryptoJS.AES.encrypt(response.data.data.token, 'rosh').toString())
+
+          window.location.replace('/jmis/');
 
         } else { 
           commit('setErrors',response.data.message);
@@ -48,10 +54,10 @@ export default createStore({
   },
   logOut({state,commit},id){
 
-    localStorage.removeItem("user_token")
-    localStorage.removeItem("user")
+    localStorage.removeItem("rosh")
+    localStorage.removeItem("rich")
     commit('setUser',{})
-    window.location.replace('/');
+    window.location.replace('/jmis/');
     /*axios
   .post(state.api_url+'/logout/',id)
   .then(response => {
@@ -68,7 +74,7 @@ export default createStore({
    });*/
 }
   },
-  
+
   modules: {
   }
 })

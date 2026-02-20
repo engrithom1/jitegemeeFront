@@ -125,6 +125,8 @@
   
   <script>
   import axios from "axios";
+  import * as CryptoJS from 'crypto-js';
+  
   export default {
     data() {
       return {
@@ -186,7 +188,13 @@
             var message = response.data.message
             this.$toast.success(message,{duration: 7000,dismissible: true,})
 
-            this.logout(user_id)
+            //this.logout(user_id)
+            localStorage.removeItem("rosh")
+            localStorage.removeItem("rich")
+
+            setTimeout(function(){
+              window.location.replace('/');
+            },2000);
 
             }else{
               //alert(response.data.message+"toast doesnt wak")
@@ -228,8 +236,10 @@
         this.me_btn = false;
     },
     isAuth() {
-    var user = localStorage.getItem("user");
-    var token = localStorage.getItem("user_token");
+      var user_cry = localStorage.getItem("rich") || "";
+      var token_cry = localStorage.getItem("rosh") || "";
+      var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+      var token = CryptoJS.AES.decrypt(token_cry, 'rosh').toString(CryptoJS.enc.Utf8) || null
     if (user && token) {
       user = JSON.parse(user);
       this.user_id = user.id;

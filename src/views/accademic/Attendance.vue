@@ -21,14 +21,18 @@
                 <div class="full inbox_inner_section">
                   <div class="full padding_infor_info">
                     <div class="mail-box">
-                        <aside class="sm-side">
-                          <button v-on:click="this.takeRecord" :class="take_record_btn">Take Records</button>
-                          <button v-on:click="this.viewRecord" :class="view_record_btn">View Records</button>
-                        </aside>
+                        <div class="row">
+                          <div class="col-sm-6 col-md-3">
+                            <button v-on:click="this.takeRecord" :class="take_record_btn">Take Records</button>
+                          </div>
+                          <div class="col-sm-6 col-md-3">
+                            <button v-on:click="this.viewRecord" :class="view_record_btn">View Records</button>
+                          </div>
+                        </div>
                         <!---take attendance-->
-                        <aside v-if="take_record" class="lg-side">
-                          <div class="inbox-body">
-                              <div class="mail-option">
+                        <div v-if="take_record" class="w-100">
+                          <div class="mt-3">
+                              <div class="">
                                 <div class="chk-all w-100">
                                   <form @submit.prevent="getClassStudents" class="form">
                                     <div class="row">
@@ -138,12 +142,12 @@
                                 </div>
                               </form>
                           </div>
-                        </aside>
+                        </div>
                         <!---records heresssssss-->
-                        <aside v-if="view_record" class="lg-side">
-                          <div class="inbox-body">
-                              <div class="mail-option">
-                                <div class="chk-all">
+                        <div v-if="view_record" class="w-100">
+                          <div class="mt-3">
+                              <div class="">
+                                <div class="chk-all w-100">
                                   <form @submit.prevent="getAttendanceRecords" class="">
                                     <div class="row">
                                       <div class="col-md-3 col-sm-6 form-group">
@@ -213,7 +217,7 @@
                                 </tbody>
                               </table>
                           </div>
-                        </aside>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -238,6 +242,8 @@
 
 <script>
   import axios from "axios";
+  import * as CryptoJS from 'crypto-js';
+
   export default {
     data() {
       return{
@@ -282,8 +288,10 @@
     },
     methods:{
       isAuth() {
-      var user = localStorage.getItem("user");
-      var token = localStorage.getItem("user_token");
+      var user_cry = localStorage.getItem("rich") || "";
+      var token_cry = localStorage.getItem("rosh") || "";
+      var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+      var token = CryptoJS.AES.decrypt(token_cry, 'rosh').toString(CryptoJS.enc.Utf8) || null
       if (user && token) {
         user = JSON.parse(user);
         this.user_id = user.id;

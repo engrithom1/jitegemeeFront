@@ -294,9 +294,13 @@
                             <div class="full progress_bar_inner m-3">
                                 <div class="d-flex justify-content-center">
                                     <div class="m-3">
-                                        <button class="btn btn-success ml-1">Edit Student</button>
+                                        <button class="btn btn-success ml-1" data-toggle="modal"
+                                        data-target="#edit-student">Edit Student</button>
+                                        <button v-on:click="onChangeClass()" class="btn btn-success ml-1" data-toggle="modal"
+                                        data-target="#edit-class">Edit Class</button>
                                         <button class="btn btn-success ml-1">Edit Parent</button>
-                                        <button class="btn btn-danger ml-1">Transfer Out</button>
+                                        <button data-toggle="modal"
+                                        data-target="#transfer-modal" class="btn btn-secondary ml-1">Transfer Out</button>
                                     </div>
                                 </div>
                             </div>
@@ -318,12 +322,210 @@
         </div>
         <!-- payment table-->
     </div>
+
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="edit-class">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Change Student Class</h4>
+          <button type="button" class="close" data-dismiss="modal">
+            &times;
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <p>Your about to change the class of  <b class="text-uppercase"> {{ " "+student.first_name }}</b></p>
+          <form @submit.prevent="updateStudentClass" class="p-3">
+            <p v-for="error in edit_errors" :key="error" class="text-danger">
+              {{ error[0] }}
+            </p>
+            <div class="form-group">
+              <h4></h4>
+            </div>
+            <div class="form-group">
+                  <label>Choose Class*</label>
+                  <select class="form-control" required v-model="this.edit_class_id">
+                    <option
+                      class="text-capitalize"
+                      v-for="clas in og_class"
+                      :key="clas.id"
+                      :value="clas.id"
+                    >
+                      {{ clas.classname }}
+                    </option>
+                  </select>
+                </div>
+            <div class="form-group">
+              <label for="cname">Reason (10-100 characters)*</label>
+              <input
+                type="text"
+                minlength="10"
+                maxlength="100"
+                class="form-control"
+                v-model="this.edit_class_reason"
+                placeholder="why"
+                aria-describedby="emailHelp"
+              />
+            </div>
+
+            <div class="modal-footer">
+              <button class="btn btn-success">Submit</button>
+              <button type="button" class="btn btn-danger" data-dismiss="modal">
+                Close
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!----transfer here-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="transfer-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Student Transfer Out</h4>
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
+          </div>
+          <!-- Modal body -->
+          <div class="modal-body">
+            <p>Your about to make tranfer of <b class="text-uppercase"> {{ " "+student.first_name }}</b></p>
+            <form @submit.prevent="studentTranferOut" class="p-3">
+              <p v-for="error in edit_errors" :key="error" class="text-danger">
+                {{ error[0] }}
+              </p>
+              <div class="form-group">
+                <h4></h4>
+              </div>
+
+              <div class="form-group">
+                <label for="sname">School *</label>
+                <input
+                  type="text"
+                  minlength="10"
+                  maxlength="100"
+                  class="form-control"
+                  v-model="this.school"
+                  placeholder="school name"
+                  aria-describedby="emailHelp"
+                />
+              </div>
+              
+              <div class="form-group">
+                <label for="cname">Reason (10-100 characters)*</label>
+                <input
+                  type="text"
+                  minlength="10"
+                  maxlength="100"
+                  class="form-control"
+                  v-model="this.reason"
+                  placeholder="why"
+                  aria-describedby="emailHelp"
+                />
+              </div>
+  
+              <div class="modal-footer">
+                <button class="btn btn-success">Submit</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                  Close
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      </div>
+    <!---->
+
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="edit-student">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Change Student Info</h4>
+          <button type="button" class="close" data-dismiss="modal">
+            &times;
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+           <p>Still working on</p> 
+          <!--form @submit.prevent="updateStudentClass" class="p-3">
+            <p v-for="error in edit_errors" :key="error" class="text-danger">
+              {{ error[0] }}
+            </p>
+            <div class="form-group">
+              <label for="cname">Class Name*</label>
+              <input
+                type="text"
+                class="form-control"
+                v-model="this.anything"
+                placeholder="A1"
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <div class="form-group">
+                  <label>Class Teacher*</label>
+                  <select class="form-control" required v-model="this.edit_teacher_id">
+                    <option
+                      class="text-capitalize"
+                      v-for="staff in staffs"
+                      :key="staff.id"
+                      :value="staff.id"
+                    >
+                      {{ staff.initial+" "+staff.first_name+" "+staff.middle_name+" "+staff.last_name }}
+                    </option>
+                  </select>
+                </div>
+            <div class="form-group">
+              <label for="cname">Room Number*</label>
+              <input
+                type="text"
+                class="form-control"
+                v-model="this.edit_roomnumber"
+                placeholder="Room 21"
+                aria-describedby="emailHelp"
+              />
+            </div>
+
+            <hr/>
+                <div v-if="edit_coz_show" class="form-group">
+                  <label>Select Course*</label>
+                  <select class="form-control" required v-model="this.edit_course_id">
+                    <option disabled value="" selected>Select Course</option>
+                    <option
+                      class="text-capitalize"
+                      v-for="course in courses"
+                      :key="course.id"
+                      :value="course.id"
+                    >
+                      {{ course.coursename }}
+                    </option>
+                  </select>
+                </div>
+            <div class="modal-footer">
+              <button class="btn btn-success">Submit</button>
+              <button type="button" class="btn btn-danger" data-dismiss="modal">
+                Close
+              </button>
+            </div>
+          </form-->
+        </div>
+      </div>
+    </div>
+    </div>
     
   </template>
   
   <script>
   import axios from "axios"
   import jspdf from "jspdf"
+  import * as CryptoJS from 'crypto-js';
 
   export default {
     data() {
@@ -348,10 +550,82 @@
         parent:{},
         ////finance
         feepays:[],
-        balance:0
+        balance:0,
+        ///change class
+        claszs: [],
+        og_class:[],
+        og_class_id:"",
+        edit_class_id:"",
+        edit_class_reason:"",
+        reason:"",
+        school:""
       };
     },
     methods: {
+      async studentTranferOut(){
+          
+          var student_id = this.student.id
+          var reason = this.reason
+          var school = this.school
+          
+          
+           if(reason == null || reason == ""){
+             
+             alert('Reason is required')
+           }else{
+             
+                var response = await axios
+                .post(this.$store.state.api_url + "/student-transfer-out",{student_id,reason,school})
+                .catch((errors) => {
+                  var message = "Network or Request Errors";
+                  this.$toast.error(message,{duration: 7000,dismissible: true,})
+                });
+
+                  if (response.data.success) {
+                    this.reason = ''
+                    this.school = ''
+                    var message = response.data.message;
+                    this.$toast.success(message,{duration: 7000,dismissible: true,})
+                  } else {
+                    var message = response.data.message;
+                    this.$toast.error(message,{duration: 7000,dismissible: true,})
+                  }
+           }
+        },
+        async updateStudentClass(){
+          var og_id  = this.og_class_id
+          var class_id = this.edit_class_id
+          var student_id = this.student.id
+          var reason = this.edit_class_reason
+          var level_id = this.student.level_id
+          
+           if(reason == null || reason == ""){
+             
+             alert('Reason is required')
+           }else{
+              if(og_id == class_id){
+                alert('nothing to change')
+              }else{
+                var response = await axios
+                .post(this.$store.state.api_url + "/change-student-class",{og_id,class_id,student_id,reason,level_id})
+                .catch((errors) => {
+                  var message = "Network or Server Errors";
+                  this.$toast.error(message,{duration: 7000,dismissible: true,})
+                });
+
+                  if (response.data.success) {
+                    var message = response.data.message;
+                    this.$toast.success(message,{duration: 7000,dismissible: true,})
+                  } else {
+                    var message = response.data.message;
+                    this.$toast.error(message,{duration: 7000,dismissible: true,})
+                  }
+              }
+           }
+        },
+        updateStudentInfo(){
+            
+        },    
     searchStudentInfo() {
       this.index_no_erro = ""
       this.search_loading = true
@@ -471,9 +745,29 @@
         })
 
     },
+    async allClaszs() {
+        
+      var response = await axios.get(this.$store.state.api_url + "/class")
+        console.log(response.data);
+        this.claszs = response.data;
+
+    },
+    onChangeClass(){
+        var level = this.admission.level_id
+        this.og_class_id = this.admission.classroom_id
+        this.edit_class_id = this.admission.classroom_id
+        this.og_class = this.claszs.filter((i) => i.level_id === level);
+
+        console.log(this.og_class)
+        console.log(this.og_class_id)
+    },
+
     isAuth() {
-    var user = localStorage.getItem("user");
-    var token = localStorage.getItem("user_token");
+      var user_cry = localStorage.getItem("rich") || "";
+      var token_cry = localStorage.getItem("rosh") || "";
+      var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+      var token = CryptoJS.AES.decrypt(token_cry, 'rosh').toString(CryptoJS.enc.Utf8) || null
+
     if (user && token) {
       user = JSON.parse(user);
       this.user_id = user.id;
@@ -486,6 +780,7 @@
     },
     created() {
       this.isAuth();
+      this.allClaszs();
     },
   };
   </script>

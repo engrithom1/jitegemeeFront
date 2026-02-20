@@ -193,6 +193,8 @@
 
 <script>
 import axios from "axios";
+import * as CryptoJS from 'crypto-js';
+
 export default {
   data() {
     return{
@@ -213,8 +215,12 @@ export default {
   },
   methods:{
     isAuth() {
-    var user = localStorage.getItem("user");
-    var token = localStorage.getItem("user_token");
+    
+    var user_cry = localStorage.getItem("rich") || "";
+    var token_cry = localStorage.getItem("rosh") || "";
+    var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+    var token = CryptoJS.AES.decrypt(token_cry, 'rosh').toString(CryptoJS.enc.Utf8) || null
+    
     if (user && token) {
       user = JSON.parse(user);
       this.user_id = user.id;
@@ -238,7 +244,7 @@ export default {
   async dashBalances(){
       var response = await axios.get(this.$store.state.api_url + "/dash-balances")
         //console.log(response.data);
-        this.balances = new Intl.NumberFormat().format(response.data);
+        this.balances = response.data;
   },
   async dashStudents(){
       var response = await axios.get(this.$store.state.api_url + "/dash-students")
@@ -264,13 +270,13 @@ export default {
       var year = this.academic_year
       var response = await axios.post(this.$store.state.api_url + "/dash-paids",{year})
         //console.log(response.data);
-        this.paids = new Intl.NumberFormat().format(response.data);
+        this.paids = response.data;
   },
   async dashDebits(){
       var year = this.academic_year
       var response = await axios.post(this.$store.state.api_url + "/dash-debits",{year})
         //console.log(response.data);
-        this.debits = new Intl.NumberFormat().format(response.data);
+        this.debits = response.data;
   },
   async dashAttendance(){
       var year = this.academic_year

@@ -3,3 +3,20 @@
 -------------------------------------------------------------------*/
 
 /** ADD YOUR AWESOME CODES HERE **/
+
+@media (max-width: 576px) {
+    .container {
+        width: 100%;
+        padding: 0 5px;
+    }
+    .padding_infor_info {
+        padding: 5px 5px;
+    }
+    .payment_option li {
+        margin-bottom: 10px;
+    }
+    #content{
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+    }
+}

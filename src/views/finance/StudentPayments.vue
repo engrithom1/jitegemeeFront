@@ -35,7 +35,7 @@
                                           <div class="input-append">
                                               <input type="text" minlength="4" maxlength="6"
                                                   v-model="this.search_index_no" class="sr-input"
-                                                  placeholder="regs number 000001" />
+                                                  placeholder="registratio /index no" />
                                               <button class="btn sr-btn" type="submit">
                                                   <i class="fa fa-search"></i>
                                               </button>
@@ -119,10 +119,9 @@
               </div>
           </div>
 
-
           <!--add payments-->
           <div v-if="find_student" class="row column4 graph">
-              <div class="col-sm-6">
+              <div class="col-sm-7">
                   <div v-if="prepare_payment" class="white_shd full margin_bottom_30">
                       <div class="full graph_head">
                           <div class="d-flex justify-content-between">
@@ -215,7 +214,7 @@
 
                                       </div>
                                       <div class="col-sm-6">
-                                          <div class="form-group">
+                                          <div v-if="student.level_id < 5" class="form-group">
                                               <label for="date_to">Valid Until</label>
                                               <select class="form-control" id="date_to" v-model="pay_valid_to" required >
                                                 <option disabled value="" selected>Select Date</option>
@@ -223,6 +222,16 @@
                                                 <option :value="accademic_year+'0610'">{{ '10/ 06/ '+accademic_year }}</option>
                                                 <option :value="accademic_year+'0910'">{{ '10/ 09/ '+accademic_year }}</option>
                                                 <option :value="accademic_year+'1210'">{{ '10/ 12/ '+accademic_year }}</option>
+                                              </select>    
+                                          </div>
+                                          <div v-if="student.level_id > 4" class="form-group">
+                                              <label for="date_to">Valid Until</label>
+                                              <select class="form-control" id="date_to" v-model="pay_valid_to" required >
+                                                <option disabled value="" selected>Select Date</option>
+                                                <option :value="accademic_year+'0910'">{{ '10/ 09/ '+accademic_year }}</option>
+                                                <option :value="accademic_year+'1210'">{{ '10/ 12/ '+accademic_year }}</option>
+                                                <option :value="(accademic_year+1)+'0310'">{{ '10/ 03/ '+(accademic_year+1) }}</option>
+                                                <option :value="(accademic_year+1)+'0630'">{{ '30/ 06/ '+(accademic_year+1) }}</option>
                                               </select>    
                                           </div>
                                       </div>
@@ -315,7 +324,7 @@
                       </div>
                   </div>
               </div>
-              <div class="col-sm-6">
+              <div class="col-sm-5">
                   <!--deposit slip-->
                   <div v-if="!prepare_payment" class="white_shd full margin_bottom_30">
                       <div class="full graph_head">
@@ -426,6 +435,8 @@
 
 <script>
 import axios from "axios";
+import * as CryptoJS from 'crypto-js';
+
 export default {
   data() {
     return {
@@ -675,27 +686,88 @@ export default {
       var b_id = this.student_balance.id
 
       ////date mandingo
-      if(s_amount > s_paid_amount + pay_amount && valid_to == year+'1210'){
-       
+     /////for o level
+      if(level_id < 5){
+
+            if(s_amount > s_paid_amount + pay_amount && valid_to == year+'1210'){
+            
             var message = 'The date should be below 10/ 12/ '+year;
             this.$toast.error(message,{duration: 7000,dismissible: true,})
+            }else{
+
+            if(s_amount == s_paid_amount + pay_amount && valid_to != year+'1210'){
+                
+                var message = 'The date should be 10/ 12/ '+year;
+                this.$toast.error(message,{duration: 7000,dismissible: true,})
+            }else{
+
+                if(pay_amount > s_amount - s_paid_amount){
+                
+                var message = "can't pay more than required";
+                this.$toast.error(message,{duration: 7000,dismissible: true,})
+                }else{
+                    if(pay_amount > b_amount){
+                    var message = "balance is not enought";
+                    this.$toast.error(message,{duration: 7000,dismissible: true,})
+                    }else{
+                    
+                    this.add_payment_btn = true;     
+                    if(this.role_id == 4 || this.department_id == 3){
+                        
+                        var response = await axios.post(this.$store.state.api_url + "/add_payment_to_student",{f_id,pay_amount,valid_to,student_id,user_id,role_id,b_amount,b_id,s_id,s_paid_amount,class_id,level_id,year}).catch((errors) => {
+                        //console.log(errors);
+                        var message = "Something goes wrong try again";
+                        this.$toast.error(message,{duration: 7000,dismissible: true,})
+                        this.add_payment_btn = false;
+                        });
+                        if (response.data.success) {
+                            this.feepays = response.data.feepay;
+                            this.student_balance = response.data.student_balance;
+                            this.add_payment_btn = false;
+
+                            var message = response.data.message;
+                            this.$toast.success(message,{duration: 7000,dismissible: true,})
+
+                        } else {
+                            
+                            var message = response.data.message;
+                            this.$toast.error(message,{duration: 7000,dismissible: true,})
+                            this.add_payment_btn = false;
+                        }
+
+                    }else{
+                        this.add_payment_btn = false;
+                        var message = "Your not belong to Finance Deptartiment";
+                        this.$toast.error(message,{duration: 7000,dismissible: true,})
+                    }  
+                    }
+                }
+            }
+            } 
+      ////for advance date validation  
       }else{
 
-        if(s_amount == s_paid_amount + pay_amount && valid_to != year+'1210'){
-           
-            var message = 'The date should be 10/ 12/ '+year;
+        if(s_amount > s_paid_amount + pay_amount && valid_to == (year+1)+'0630'){
+            
+            var message = 'The date should be below 30/ 06/ '+(year+1);
             this.$toast.error(message,{duration: 7000,dismissible: true,})
         }else{
 
-          if(pay_amount > s_amount - s_paid_amount){
-           
+        if(s_amount == s_paid_amount + pay_amount && valid_to != (year+1)+'0630'){
+            
+            var message = 'The date should be 30/ 06/ '+(year+1);
+            this.$toast.error(message,{duration: 7000,dismissible: true,})
+        }else{
+
+            if(pay_amount > s_amount - s_paid_amount){
+            
             var message = "can't pay more than required";
             this.$toast.error(message,{duration: 7000,dismissible: true,})
-          }else{
-             if(pay_amount > b_amount){
+            }else{
+                if(pay_amount > b_amount){
                 var message = "balance is not enought";
                 this.$toast.error(message,{duration: 7000,dismissible: true,})
-             }else{
+                }else{
                 
                 this.add_payment_btn = true;     
                 if(this.role_id == 4 || this.department_id == 3){
@@ -705,31 +777,37 @@ export default {
                     var message = "Something goes wrong try again";
                     this.$toast.error(message,{duration: 7000,dismissible: true,})
                     this.add_payment_btn = false;
-                  });
-                  if (response.data.success) {
-                      this.feepays = response.data.feepay;
-                      this.student_balance = response.data.student_balance;
-                      this.add_payment_btn = false;
+                    });
+                    if (response.data.success) {
+                        this.feepays = response.data.feepay;
+                        this.student_balance = response.data.student_balance;
+                        this.add_payment_btn = false;
 
-                      var message = response.data.message;
-                      this.$toast.success(message,{duration: 7000,dismissible: true,})
+                        var message = response.data.message;
+                        this.$toast.success(message,{duration: 7000,dismissible: true,})
 
-                  } else {
-                     
-                      var message = response.data.message;
-                      this.$toast.error(message,{duration: 7000,dismissible: true,})
-                      this.add_payment_btn = false;
-                  }
+                    } else {
+                        
+                        var message = response.data.message;
+                        this.$toast.error(message,{duration: 7000,dismissible: true,})
+                        this.add_payment_btn = false;
+                    }
 
                 }else{
                     this.add_payment_btn = false;
                     var message = "Your not belong to Finance Deptartiment";
                     this.$toast.error(message,{duration: 7000,dismissible: true,})
-             }  
-             }
-          }
+                }  
+                }
+            }
         }
-        }  
+        } 
+
+      }
+
+      ////end add payment
+        
+        
     },
     async addFeeToStudent(fee_id, fee_amount){
       
@@ -837,8 +915,12 @@ export default {
      
     },
     isAuth() {
-      var user = localStorage.getItem("user");
-      var token = localStorage.getItem("user_token");
+      
+        var user_cry = localStorage.getItem("rich") || "";
+        var token_cry = localStorage.getItem("rosh") || "";
+        var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+        var token = CryptoJS.AES.decrypt(token_cry, 'rosh').toString(CryptoJS.enc.Utf8) || null
+
       if (user && token) {
         user = JSON.parse(user);
         this.user_id = user.id;

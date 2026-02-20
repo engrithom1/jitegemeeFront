@@ -149,7 +149,7 @@
                   <div class="modal-body">
 
                     <div class="pt-3 pr-3 pl-3 d-flex justify-content-between">
-                    <h4 class="text-camelcase">S.459.{{ this.selected_student.index_no }}</h4>
+                    <h4 class="text-camelcase">NO: {{ this.selected_student.index_no }}</h4>
                     <h4 class="text-camelcase">{{ this.selected_student.first_name+' '+this.selected_student.last_name }}</h4>
                   </div>
                   <form v-show="!change_mark_bool" @submit.prevent="addExamMarks" class="pl-2 pr-2">
@@ -277,7 +277,7 @@
 
 <script>
   import axios from "axios";
-  
+  import * as CryptoJS from 'crypto-js';
   
   export default {
     data() {
@@ -317,8 +317,11 @@
     },
     methods:{
       isAuth() {
-      var user = localStorage.getItem("user");
-      var token = localStorage.getItem("user_token");
+        var user_cry = localStorage.getItem("rich") || "";
+      var token_cry = localStorage.getItem("rosh") || "";
+      var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+      var token = CryptoJS.AES.decrypt(token_cry, 'rosh').toString(CryptoJS.enc.Utf8) || null
+
       if (user && token) {
         user = JSON.parse(user);
         this.user_id = user.id;
@@ -489,7 +492,7 @@
         
         }else{
           //perform not alert
-          alert('sio poa wanafunzi '+count_studs+', hawajawekewa marks');
+          alert('Wanafunzi '+count_studs+', hawajawekewa marks');
         }
     },
     getChangeMarks(exam){

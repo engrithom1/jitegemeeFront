@@ -1,4 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
+//import * as CryptoJS from 'crypto-js';
+
+//var user_cry = localStorage.getItem("rich")  || "";
+//var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+//user = JSON.parse(user)
 
 import Dashbord from "../views/Dashbord.vue"
 ///admission
@@ -46,146 +51,146 @@ import Dev from "../views/Dev.vue"
 
 const routes = [
   {
-    path: '/dev',
+    path: '/jmis/dev',
     name: 'dev',
     component: Dev
   },
   {
-    path: '/',
+    path: '/jmis/',
     name: 'dashbord',
     component: Dashbord
   },
   /*{
-    path: '/dashbord',
+    path: '/jmis/dashbord',
     name: 'dashbord',
     component: Dashbord
   },*/
   {
-    path: '/addstudent',
+    path: '/jmis/addstudent',
     name: 'Addstudent',
     component: AddStudent
   },
   {
-    path: '/parents',
+    path: '/jmis/parents',
     name: 'Parents',
     component: Parents
   },
   {
-    path: '/allstudents',
+    path: '/jmis/allstudents',
     name: 'Allstudent',
     component: AllStudent
   },
   {
-    path: '/graduates',
+    path: '/jmis/graduates',
     name: 'Graduates',
     component: Graduates
   },
   {
-    path: '/classroom',
+    path: '/jmis/classroom',
     name: 'Class',
     component: Class
   },
   {
-    path: '/courses',
+    path: '/jmis/courses',
     name: 'Course',
     component: Course
   },
   {
-    path: '/subjects',
+    path: '/jmis/subjects',
     name: 'Subjects',
     component: Subjects
   },
   {
-    path: '/exams',
+    path: '/jmis/exams',
     name: 'Exams',
     component: Exams
   },
   {
-    path: '/grades',
+    path: '/jmis/grades',
     name: 'Grades',
     component: Grades
   },
   {
-    path: '/student-fees',
+    path: '/jmis/student-fees',
     name: 'StudentFees',
     component: StudentFees
   },
   {
-    path: '/student-payments',
+    path: '/jmis/student-payments',
     name: 'StudentPayments',
     component: StudentPayments
   },
   {
-    path: '/payment-reports',
+    path: '/jmis/payment-reports',
     name: 'PaymentReports',
     component: PaymentReports
   },
   {
-    path: '/all-staff',
+    path: '/jmis/all-staff',
     name: 'AllStaff',
     component: AllStaff
   },
   {
-    path: '/department',
+    path: '/jmis/department',
     name: 'Department',
     component: Department
   },
   {
-    path: '/exams-marks',
+    path: '/jmis/exams-marks',
     name: 'ExamMarks',
     component: ExamMarks
   },
   {
-    path: '/exams-results',
+    path: '/jmis/exams-results',
     name: 'ExamResults',
     component: ExamResults
   },
   {
-    path: '/attendance',
+    path: '/jmis/attendance',
     name: 'Attendance',
     component: Attendance
   },
 
   {
-    path: '/reconciliation',
+    path: '/jmis/reconciliation',
     name: 'Reconciliation',
     component: Reconciliation
   },
   ///students pages student-fees-payments
   {
-    path: '/student-info',
+    path: '/jmis/student-info',
     name: 'StudentInfo',
     component: StudentInfo
   },
   {
-    path: '/student-fees-payments',
+    path: '/jmis/student-fees-payments',
     name: 'Payments',
     component: Payments
   },
   {
-    path: '/student-class-mates',
+    path: '/jmis/student-class-mates',
     name: 'Mates',
     component: Mates
   },
   {
-    path: '/student-exam-results',
+    path: '/jmis/student-exam-results',
     name: 'Results',
     component: Results
   },
   {
-    path: '/student-teachers',
+    path: '/jmis/student-teachers',
     name: 'Teachers',
     component: Teachers
   },
 
   ///other
   {
-    path: '/controls',
+    path: '/jmis/controls',
     name: 'Controls',
     component: Controls
   },
   {
-    path: '/profile',
+    path: '/jmis/profile',
     name: 'Profile',
     component: Profile
   },

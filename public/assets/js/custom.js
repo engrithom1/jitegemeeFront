@@ -18,6 +18,12 @@ $(document).ready(function () {
   $('#sidebarCollapse').on('click', function () {
     $('#sidebar').toggleClass('active');
   });
+  $('.menu-colapse').on('click', function () {
+    var w = screen.width
+    if(w < 500){
+      $('#sidebar').toggleClass('active');
+    }
+  });
   /*-- calendar js --*/
   $('#example14').calendar({
     inline: true

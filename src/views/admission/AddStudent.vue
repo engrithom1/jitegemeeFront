@@ -169,7 +169,7 @@
                           <div class="form-group">
                             <label for="sindex">Admission Number* <span class="text-danger">{{ this.proposed_index_no }}</span></label>
                             <input
-                              type="text"
+                              type="number"
                               class="form-control"
                               v-model="this.form.index_no"
                               minlength="6"
@@ -225,23 +225,32 @@
                         <div class="col-sm-12 col-md-6">
                           <div class="form-group">
                             <label for="sphone">Nationality*</label>
-                            <input
-                              type="text"
-                              class="form-control"
-                              v-model="this.form.nationality"
-                              placeholder="Tanzania"
-                              required
-                            />
+                            <select
+                            class="form-control"
+                            v-model="this.form.nationality"
+                            id="gender"
+                            required
+                          >
+                            <option class="text-capitalize" disabled selected value="">Select Nation</option>
+                            <option class="text-capitalize" value="Tanzanian">Tanzanian</option>
+                            <option class="text-capitalize" value="Zanzibar">Zanzibar</option>
+                            <option class="text-capitalize" value="Main Land">Main Land</option>
+                          </select>
                           </div>
                           <div class="form-group">
                             <label for="sphone">Religion*</label>
-                            <input
-                              type="text"
-                              class="form-control"
-                              v-model="this.form.religion"
-                              placeholder="free"
-                              required
-                            />
+                            <select
+                            class="form-control"
+                            v-model="this.form.religion"
+                            id="gender"
+                            required
+                          >
+                            <option class="text-capitalize" disabled selected value="">Select Religion</option>
+                            <option class="text-capitalize" value="Christian">Christian</option>
+                            <option class="text-capitalize" value="Islamic">Islamic</option>
+                            <option class="text-capitalize" value="Other">Other</option>
+                          </select>
+                            
                           </div>
                           <div class="form-group">
                             <label for="sphone">Phone</label>
@@ -557,6 +566,7 @@
 
 <script>
 import axios from "axios";
+import * as CryptoJS from 'crypto-js';
 
 export default {
   data() {
@@ -731,6 +741,8 @@ export default {
         this.entrys = response.data;
     },
     async addStudent() {
+
+      this.form.index_no = this.form.index_no.toString()
       
       var accademic_year = this.form.accademic_year;
       var birth_date = this.form.birth_date;
@@ -757,7 +769,8 @@ export default {
         }
       });
       }
-
+      
+      
       var fees = feef.toString()
 
       if(this.form.role_id == 4 || this.form.department_id == 2){
@@ -816,8 +829,10 @@ export default {
     },
 
     isAuth() {
-      var user = localStorage.getItem("user");
-      var token = localStorage.getItem("user_token");
+      var user_cry = localStorage.getItem("rich") || "";
+      var token_cry = localStorage.getItem("rosh") || "";
+      var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+      var token = CryptoJS.AES.decrypt(token_cry, 'rosh').toString(CryptoJS.enc.Utf8) || null
       if (user && token) {
         user = JSON.parse(user);
         this.form.user_id = user.id;

@@ -215,6 +215,7 @@
 
 <script>
 import axios from "axios";
+import * as CryptoJS from 'crypto-js';
 
 export default {
   data() {
@@ -327,8 +328,10 @@ export default {
         
     },
     isAuth() {
-      var user = localStorage.getItem("user");
-      var token = localStorage.getItem("user_token");
+      var user_cry = localStorage.getItem("rich") || "";
+      var token_cry = localStorage.getItem("rosh") || "";
+      var user = CryptoJS.AES.decrypt(user_cry, 'rich').toString(CryptoJS.enc.Utf8) || null
+      var token = CryptoJS.AES.decrypt(token_cry, 'rosh').toString(CryptoJS.enc.Utf8) || null
       if (user && token) {
         user = JSON.parse(user);
         this.form.user_id = user.id;
